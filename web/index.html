@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AmritaOT - Login</title>
+    <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+    <div class="split-screen">
+        <div class="brand-panel">
+            <div class="brand-content">
+                <h1>AmritaOT</h1>
+                <p>Industrial Equipment Monitoring System</p>
+                <div id="mock-badge" style="display:none;" class="badge mock-badge">Mock Data Mode</div>
+            </div>
+            <div class="animated-grid"></div>
+        </div>
+        <div class="form-panel">
+            <div class="card">
+                <h2>Login to AmritaOT</h2>
+                <div id="error-msg" class="error hidden"></div>
+                <form id="login-form">
+                    <div class="field">
+                        <label>Username</label>
+                        <input type="text" id="username" required autocomplete="username">
+                    </div>
+                    <div class="field">
+                        <label>Password</label>
+                        <input type="password" id="password" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="primary-btn">Sign In</button>
+                </form>
+                <div id="demo-logins" class="hidden" style="margin-top: 1rem;">
+                    <p>Demo Logins:</p>
+                    <button class="btn" onclick="document.getElementById('username').value='admin';">Admin</button>
+                    <button class="btn" onclick="document.getElementById('username').value='engineer';">Engineer</button>
+                    <button class="btn" onclick="document.getElementById('username').value='auditor';">Auditor</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="/src/views/login.js"></script>
+</body>
+</html>

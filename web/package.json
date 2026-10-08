@@ -1,0 +1,27 @@
+{
+  "name": "AmritaOT-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "go": "npm install && npm-run-all --parallel dev open",
+    "dev": "vite",
+    "open": "node -e \"setTimeout(() => import('open').then(m => m.default('http://localhost:5173')), 2000)\"",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src/**/*.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.2"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "eslint": "^8.57.0",
+    "jsdom": "^30.1.2",
+    "npm-run-all2": "^6.1.2",
+    "open": "^10.1.0",
+    "vite": "^5.2.8",
+    "vitest": "^1.5.0"
+  }
+}

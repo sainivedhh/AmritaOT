@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AmritaOT</title>
+    <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">AmritaOT</div>
+        <div class="nav-links">
+            <a href="/dashboard.html" class="active">Dashboard</a>
+            <a href="/alerts.html">Alerts</a>
+            <button id="logout-btn">Logout</button>
+        </div>
+    </nav>
+    <main class="container">
+        <header class="page-header">
+            <h2>Live Dashboard</h2>
+        </header>
+        <div class="grid" id="machines-grid">
+            <!-- Populated by JS -->
+        </div>
+    </main>
+    <script type="module" src="/src/views/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+
+> AmritaOT-web@1.0.0 build
+> vite build
+
+[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+transforming...
+[32mG£τ[39m 12 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mdashboard.html                [39m[1m[2m1.04 kB[22m[1m[22m[2m Gφι gzip: 0.48 kB[22m
+[2mdist/[22m[32malerts.html                   [39m[1m[2m1.44 kB[22m[1m[22m[2m Gφι gzip: 0.58 kB[22m
+[2mdist/[22m[32mindex.html                    [39m[1m[2m2.11 kB[22m[1m[22m[2m Gφι gzip: 0.75 kB[22m
+[2mdist/[22m[35massets/client-JaQYfmk8.css    [39m[1m[2m1.70 kB[22m[1m[22m[2m Gφι gzip: 0.70 kB[22m
+[2mdist/[22m[36massets/dom-CsNVdiiG.js        [39m[1m[2m0.39 kB[22m[1m[22m[2m Gφι gzip: 0.28 kB[22m
+[2mdist/[22m[36massets/main-128EdjCi.js       [39m[1m[2m0.42 kB[22m[1m[22m[2m Gφι gzip: 0.28 kB[22m
+[2mdist/[22m[36massets/alerts-DxP5k_xO.js     [39m[1m[2m0.48 kB[22m[1m[22m[2m Gφι gzip: 0.33 kB[22m
+[2mdist/[22m[36massets/dashboard-DpyBMsN9.js  [39m[1m[2m0.59 kB[22m[1m[22m[2m Gφι gzip: 0.40 kB[22m
+[2mdist/[22m[36massets/client-B4KqyDok.js     [39m[1m[2m1.55 kB[22m[1m[22m[2m Gφι gzip: 0.81 kB[22m
+[32mG£τ built in 372ms[39m

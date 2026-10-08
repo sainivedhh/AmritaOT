@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerts - AmritaOT</title>
+    <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">AmritaOT</div>
+        <div class="nav-links">
+            <a href="/dashboard.html">Dashboard</a>
+            <a href="/alerts.html" class="active">Alerts</a>
+            <button id="logout-btn">Logout</button>
+        </div>
+    </nav>
+    <main class="container">
+        <header class="page-header">
+            <h2>System Alerts</h2>
+        </header>
+        <div class="card">
+            <table style="width:100%; text-align:left;">
+                <thead>
+                    <tr>
+                        <th>Machine ID</th>
+                        <th>Metric</th>
+                        <th>Value</th>
+                        <th>Severity</th>
+                    </tr>
+                </thead>
+                <tbody id="alerts-tbody">
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <script type="module" src="/src/views/alerts.js"></script>
+</body>
+</html>

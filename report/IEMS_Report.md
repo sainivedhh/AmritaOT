@@ -1,6 +1,6 @@
 # Lab Report: Secure Industrial Equipment Monitoring System (IEMS)
 ## Course: 24CYS401 – Secure Software Engineering
-## Project Title: SentinelOT (IEMS)
+## Project Title: AmritaOT (IEMS)
 
 ---
 
@@ -108,7 +108,7 @@ Refactored logic inside `src/`. JWT, `hmac.compare_digest`, `isfinite` checks ad
 ---
 
 ## Phase 13 - Containerized Development: Docker and Kubernetes
-`sentinelot:1.0` Dockerfile created. `deployment.yaml` built with non-root security contexts.
+`AmritaOT:1.0` Dockerfile created. `deployment.yaml` built with non-root security contexts.
 
 **Deliverable**: Dockerfile, Kubernetes manifests.
 
