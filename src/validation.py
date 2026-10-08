@@ -28,27 +28,37 @@ def validate_metric(name, value):
             return False
     return True
 
+
 def validate_payload(data):
     if not isinstance(data, dict):
         return "Payload must be JSON object"
-        
+
     for k in ['temperature', 'pressure', 'vibration', 'power']:
         if k in data and not validate_metric(k, data[k]):
             return f"Invalid value for {k}"
-            
+
     status = data.get('status')
     if status not in VALID_STATUS:
         return "Invalid status"
-        
+
     return None
+
 
 def check_plausibility(last_reading, new_reading):
     if not last_reading:
         return True
-    
+
     for k in ['temperature', 'pressure', 'vibration', 'power']:
-        if k in new_reading and last_reading[k] is not None:
-            jump = abs(new_reading[k] - last_reading[k])
-            if jump > MAX_ROC[k]:
-                return False
+        if k not in new_reading:
+            continue
+
+        prev_value = last_reading.get(k) if isinstance(last_reading, dict) else last_reading.get(k)
+        new_value = new_reading.get(k)
+
+        if prev_value is None or new_value is None:
+            continue
+
+        jump = abs(new_value - prev_value)
+        if jump > MAX_ROC[k]:
+            return False
     return True
