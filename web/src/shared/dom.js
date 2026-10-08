@@ -9,12 +9,17 @@ export function h(tag, props = {}, children = []) {
       el.setAttribute(key, value);
     }
   }
-  for (const child of children) {
-    if (typeof child === 'string' || typeof child === 'number') {
-      el.appendChild(document.createTextNode(child));
-    } else if (child instanceof Node) {
-      el.appendChild(child);
+  const append = (item) => {
+    if (item === null || item === undefined || item === false || item === true) return;
+    if (Array.isArray(item)) {
+      item.forEach(append);
+    } else if (typeof item === 'string' || typeof item === 'number') {
+      el.appendChild(document.createTextNode(String(item)));
+    } else if (item instanceof Node) {
+      el.appendChild(item);
     }
-  }
+  };
+  append(children);
   return el;
 }
+

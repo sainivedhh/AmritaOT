@@ -6,15 +6,15 @@ def test_login_flow(client, seed_data):
     res = client.post('/login', json={"username": "admin", "password": "wrong"})
     assert res.status_code == 401
     
-    # Lockout after 5 attempts
-    for _ in range(4):
+    # Lockout after 5 attempts for user admin
+    for _ in range(3):
         client.post('/login', json={"username": "admin", "password": "wrong"})
         
     res = client.post('/login', json={"username": "admin", "password": "wrong"})
     assert res.status_code == 429
     
-    # Engineer login
-    res = client.post('/login', json={"username": "engineer", "password": "engpass"})
+    # Engineer login from different remote address
+    res = client.post('/login', json={"username": "engineer", "password": "engpass"}, environ_overrides={'REMOTE_ADDR': '192.168.1.100'})
     assert res.status_code == 200
     token = res.get_json()['token']
     

@@ -1,45 +1,131 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="light" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AmritaOT - Login</title>
-    <link rel="stylesheet" href="/src/styles/main.css">
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AmritaOT – Secure Industrial Equipment Monitoring System | Authentication</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<!-- Google Fonts: Space Grotesk, IBM Plex Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="/src/styles/main.css">
 </head>
-<body>
-    <div class="split-screen">
-        <div class="brand-panel">
-            <div class="brand-content">
-                <h1>AmritaOT</h1>
-                <p>Industrial Equipment Monitoring System</p>
-                <div id="mock-badge" style="display:none;" class="badge mock-badge">Mock Data Mode</div>
-            </div>
-            <div class="animated-grid"></div>
-        </div>
-        <div class="form-panel">
-            <div class="card">
-                <h2>Login to AmritaOT</h2>
-                <div id="error-msg" class="error hidden"></div>
-                <form id="login-form">
-                    <div class="field">
-                        <label>Username</label>
-                        <input type="text" id="username" required autocomplete="username">
-                    </div>
-                    <div class="field">
-                        <label>Password</label>
-                        <input type="password" id="password" required autocomplete="current-password">
-                    </div>
-                    <button type="submit" class="primary-btn">Sign In</button>
-                </form>
-                <div id="demo-logins" class="hidden" style="margin-top: 1rem;">
-                    <p>Demo Logins:</p>
-                    <button class="btn" onclick="document.getElementById('username').value='admin';">Admin</button>
-                    <button class="btn" onclick="document.getElementById('username').value='engineer';">Engineer</button>
-                    <button class="btn" onclick="document.getElementById('username').value='auditor';">Auditor</button>
-                </div>
-            </div>
-        </div>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex items-center justify-center p-4 font-body-md">
+
+<main class="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-md p-8">
+  <!-- Header Logo & Title -->
+  <div class="flex flex-col items-center mb-6 text-center">
+    <img src="/src/assets/logo.png" alt="AmritaOT Logo" class="h-16 w-auto object-contain mb-3" onerror="this.onerror=null; this.src='https://lh3.googleusercontent.com/aida/AEtjO1VWtLOBGTe3rviRxpbTp4xN0zjlukaHppJw-2lApYIpkcHa0yYUdJcr8BaTiEwWFN4p9NtPo0KQ6YJha7f9jksZtVrTiWbvmlT8c1v3cpyWsJNEzNtS-IeAvBKBnfvLjYoEwt-LBFP_b9qaYkK0K_HUEJZDbOLDhOysS8Id4jqvtgEomoGCgeg6ztBBSptGT7dDLIF0RXj1duQKDwqMAx_TpCgj12PBI81DueBbowG9GA';">
+    <h1 class="text-2xl font-bold text-slate-900 font-headline-md tracking-tight">AmritaOT</h1>
+    <p class="text-sm text-slate-500 font-medium">Industrial Monitoring System</p>
+  </div>
+
+  <!-- Role Selectors -->
+  <div class="mb-6" id="demo-logins">
+    <div class="flex items-center justify-between mb-2">
+      <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Select Role</label>
+      <span class="text-xs text-blue-600 font-medium hidden" id="mock-badge">Demo Ready</span>
     </div>
-    <script type="module" src="/src/views/login.js"></script>
+    <div class="grid grid-cols-3 gap-2">
+      <button class="role-btn p-2.5 text-center bg-blue-50 border-2 border-blue-500 rounded-xl transition-all" id="role-admin" onclick="selectRole('admin', 'admin123', 'Admin')" type="button">
+        <span class="material-symbols-outlined text-blue-600 text-lg block mb-1">admin_panel_settings</span>
+        <span class="text-xs font-semibold text-blue-700 block">Admin</span>
+      </button>
+      <button class="role-btn p-2.5 text-center bg-slate-50 border border-slate-200 hover:bg-slate-100 rounded-xl transition-all" id="role-engineer" onclick="selectRole('engineer', 'engineer123', 'OT Lead')" type="button">
+        <span class="material-symbols-outlined text-slate-600 text-lg block mb-1">precision_manufacturing</span>
+        <span class="text-xs font-semibold text-slate-700 block">OT Lead</span>
+      </button>
+      <button class="role-btn p-2.5 text-center bg-slate-50 border border-slate-200 hover:bg-slate-100 rounded-xl transition-all" id="role-auditor" onclick="selectRole('auditor', 'auditor123', 'Auditor')" type="button">
+        <span class="material-symbols-outlined text-slate-600 text-lg block mb-1">policy</span>
+        <span class="text-xs font-semibold text-slate-700 block">Auditor</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Dynamic Error Message Alert -->
+  <div id="login-error-container" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-red-700 text-sm">
+    <span class="material-symbols-outlined text-lg">error</span>
+    <span id="error-msg"></span>
+  </div>
+
+  <!-- Authentication Form -->
+  <form class="space-y-4" id="login-form">
+    <div>
+      <label class="block text-xs font-semibold text-slate-600 uppercase mb-1" for="username">Username</label>
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-lg">badge</span>
+        <input class="w-full pl-10 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-slate-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" id="username" name="username" placeholder="e.g. admin" required type="text" value="admin">
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-xs font-semibold text-slate-600 uppercase mb-1" for="password">Password</label>
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-lg">key</span>
+        <input class="w-full pl-10 pr-10 py-2 bg-white border border-slate-300 rounded-xl text-slate-900 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" id="password" name="password" placeholder="Enter password" required type="password" value="admin123">
+        <button class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600" onclick="togglePasswordVisibility()" type="button">
+          <span class="material-symbols-outlined text-lg" id="pwd-eye-icon">visibility</span>
+        </button>
+      </div>
+    </div>
+
+    <button class="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 mt-2" id="submit-btn" type="submit">
+      <span class="material-symbols-outlined text-lg">lock_open</span>
+      <span id="btn-label">Sign In</span>
+    </button>
+  </form>
+</main>
+
+<script type="module" src="/src/views/login.js"></script>
+<script type="module" src="/src/shared/router.js"></script>
+
+<script>
+    function togglePasswordVisibility() {
+      const pwdInput = document.getElementById('password');
+      const eyeIcon = document.getElementById('pwd-eye-icon');
+      if (pwdInput.type === 'password') {
+        pwdInput.type = 'text';
+        eyeIcon.textContent = 'visibility_off';
+      } else {
+        pwdInput.type = 'password';
+        eyeIcon.textContent = 'visibility';
+      }
+    }
+
+    function selectRole(username, passwordVal, roleTitle) {
+      document.getElementById('username').value = username;
+      document.getElementById('password').value = passwordVal;
+
+      document.querySelectorAll('.role-btn').forEach(btn => {
+        btn.classList.remove('border-blue-500', 'bg-blue-50', 'border-2');
+        btn.classList.add('border-slate-200', 'bg-slate-50', 'border');
+        const labels = btn.querySelectorAll('span');
+        if (labels.length >= 2) {
+          labels[0].className = 'material-symbols-outlined text-slate-600 text-lg block mb-1';
+          labels[1].className = 'text-xs font-semibold text-slate-700 block';
+        }
+      });
+
+      let roleKey = username.includes('admin') ? 'admin' : (username.includes('engineer') ? 'engineer' : 'auditor');
+      let activeBtn = document.getElementById('role-' + roleKey);
+      if (activeBtn) {
+        activeBtn.classList.remove('border-slate-200', 'bg-slate-50', 'border');
+        activeBtn.classList.add('border-blue-500', 'bg-blue-50', 'border-2');
+        const labels = activeBtn.querySelectorAll('span');
+        if (labels.length >= 2) {
+          labels[0].className = 'material-symbols-outlined text-blue-600 text-lg block mb-1';
+          labels[1].className = 'text-xs font-semibold text-blue-700 block';
+        }
+      }
+    }
+
+    window.togglePasswordVisibility = togglePasswordVisibility;
+    window.selectRole = selectRole;
+</script>
+
 </body>
 </html>

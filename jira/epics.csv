@@ -1,8 +1,0 @@
-Summary,Issue Type,Epic Name,Priority,Description
-E1 - Authentication & Authorization,Epic,Auth,High,Manage secure access to the system.
-E2 - Telemetry Ingestion,Epic,Telemetry,High,Securely receive and validate sensor data.
-E3 - Alerting & Anomaly Detection,Epic,Alerting,High,Evaluate thresholds and trigger alerts.
-E4 - Threshold Management,Epic,Thresholds,Medium,Configure and audit threshold changes.
-E5 - Maintenance Scheduling,Epic,Maintenance,Low,Schedule maintenance tasks for machines.
-E6 - Audit & Logging,Epic,Audit,High,Maintain tamper-evident logs for security events.
-E7 - System Resilience,Epic,Resilience,High,Ensure system availability under load.
