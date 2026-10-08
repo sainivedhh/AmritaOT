@@ -1,0 +1,11 @@
+graph TD
+    A[IoT Edge Gateway] -->|Signed MQTT/HTTPS| B(API Gateway / Load Balancer)
+    B --> C{Telemetry Ingestion Service}
+    C -->|Valid| D[Rules Engine]
+    C -->|Invalid| E[Audit Logging]
+    D -->|Anomaly| F[Alerting Service]
+    F --> G[(PostgreSQL DB)]
+    D --> G
+    H[Web Frontend] --> B
+    B --> I[Threshold Config Service]
+    I --> G

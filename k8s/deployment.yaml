@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentinelot-api
+  namespace: sentinelot
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sentinelot-api
+  template:
+    metadata:
+      labels:
+        app: sentinelot-api
+    spec:
+      containers:
+      - name: sentinelot-api
+        image: sentinelot:1.0
+        ports:
+        - containerPort: 5000
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+        envFrom:
+        - secretRef:
+            name: sentinelot-secrets

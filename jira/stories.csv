@@ -1,0 +1,13 @@
+Summary,Issue Type,Epic Link,Priority,Story Points,Sprint,Description
+US-01 - User Login,Story,E1 - Authentication & Authorization,High,3,Sprint 1,"As an Engineer, I want to log in so that my account is secure."
+US-02 - Role-Based Access,Story,E1 - Authentication & Authorization,High,5,Sprint 1,"As an Admin, I want RBAC so that only authorized users can configure thresholds."
+US-03 - Ingest Signed Telemetry,Story,E2 - Telemetry Ingestion,High,5,Sprint 1,"As a Machine, I want to send HMAC-signed telemetry so that data integrity is maintained."
+US-04 - Evaluate Thresholds,Story,E3 - Alerting & Anomaly Detection,High,3,Sprint 1,"As the System, I want to evaluate readings against thresholds so that anomalies are detected."
+US-05 - View Alerts,Story,E3 - Alerting & Anomaly Detection,Medium,3,Sprint 1,"As an Engineer, I want to view active alerts so that I can monitor machine health."
+US-06 - Acknowledge Alert,Story,E3 - Alerting & Anomaly Detection,Medium,2,Sprint 2,"As an Engineer, I want to acknowledge alerts so that others know I am working on it."
+US-07 - Configure Thresholds,Story,E4 - Threshold Management,High,5,Sprint 2,"As an Admin, I want to configure thresholds so that anomaly detection is accurate."
+US-08 - Audit Threshold Changes,Story,E4 - Threshold Management,High,5,Sprint 2,"As an Auditor, I want threshold changes audited so that there is a tamper-evident record."
+US-09 - Schedule Maintenance,Story,E5 - Maintenance Scheduling,Low,3,Sprint 2,"As a Maintenance Supervisor, I want to schedule maintenance so that machines are serviced."
+US-10 - Write Tamper-Evident Log,Story,E6 - Audit & Logging,High,8,Sprint 2,"As the System, I want to write hash-chained logs so that tampering is detectable."
+US-11 - Implement Rate Limiting,Story,E7 - System Resilience,Medium,3,Sprint 2,"As the System, I want rate limiting on APIs so that DoS attacks are mitigated."
+US-12 - Reject Invalid Telemetry,Story,E2 - Telemetry Ingestion,High,2,Sprint 1,"As the System, I want to reject malformed or NaN telemetry so that processing does not crash."

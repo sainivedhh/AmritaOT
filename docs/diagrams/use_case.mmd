@@ -1,0 +1,13 @@
+usecaseDiagram
+    actor Engineer
+    actor Admin
+    actor Machine
+    
+    Engineer --> (View Status)
+    Engineer --> (Acknowledge Alert)
+    Admin --> (Configure Thresholds)
+    Machine --> (Ingest Telemetry)
+    
+    (Configure Thresholds) ..> (Authorize) : <<include>>
+    (Ingest Telemetry) ..> (Validate Sensor Data) : <<include>>
+    (Ingest Telemetry) ..> (Detect Anomaly and Alert) : <<extend>>
