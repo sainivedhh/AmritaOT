@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentinelOT</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background: #f4f4f5; margin: 0; }
+        header { background: #18181b; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .nav-links button { background: none; border: none; color: white; cursor: pointer; font-size: 1rem; margin-left: 1rem; }
+        .nav-links button:hover { text-decoration: underline; }
+        main { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+        .screen { display: none; }
+        .active { display: block; }
+        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1rem; }
+        input, select, button { padding: 0.5rem; margin-bottom: 1rem; width: 100%; box-sizing: border-box; }
+        button { background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #1d4ed8; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        .error { color: #dc2626; margin-bottom: 1rem; }
+        .success { color: #16a34a; margin-bottom: 1rem; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #e5e7eb; }
+        th { background: #f9fafb; }
+        .status-badge { padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.875rem; font-weight: bold; }
+        .RUNNING { background: #dcfce7; color: #166534; }
+        .IDLE { background: #fef08a; color: #854d0e; }
+        .FAULT { background: #fee2e2; color: #991b1b; }
+        .STOPPED { background: #e5e7eb; color: #374151; }
+        .stale { color: #dc2626; font-size: 0.875rem; font-weight: bold; }
+        .admin-only { display: none; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>SentinelOT</h1>
+        <div class="nav-links" id="nav-links" style="display: none;">
+            <button onclick="nav('dashboard')">Dashboard</button>
+            <button class="admin-only" onclick="nav('thresholds')">Thresholds</button>
+            <button onclick="nav('alerts')">Alerts & Maintenance</button>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Login Screen -->
+        <div id="login-screen" class="screen active card" style="max-width: 400px; margin: 4rem auto;">
+            <h2>Login</h2>
+            <div id="login-error" class="error"></div>
+            <form id="login-form">
+                <label for="username">Username</label>
+                <input type="text" id="username" autocomplete="username" required>
+                <label for="password">Password</label>
+                <input type="password" id="password" autocomplete="current-password" required>
+                <button type="submit">Log In</button>
+            </form>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboard-screen" class="screen">
+            <h2>Live Machine Dashboard</h2>
+            <div id="machines-container"></div>
+        </div>
+
+        <!-- Thresholds Screen -->
+        <div id="thresholds-screen" class="screen card admin-only">
+            <h2>Configure Thresholds</h2>
+            <div id="thresh-msg"></div>
+            <form id="thresh-form">
+                <label>Machine ID</label>
+                <input type="text" id="thresh-machine" required pattern="^[a-zA-Z0-9_-]+$">
+                <label>Metric</label>
+                <select id="thresh-metric">
+                    <option value="temperature">Temperature</option>
+                    <option value="pressure">Pressure</option>
+                    <option value="vibration">Vibration</option>
+                    <option value="power">Power</option>
+                </select>
+                <label>Min Value</label>
+                <input type="number" step="any" id="thresh-min" required>
+                <label>Max Value</label>
+                <input type="number" step="any" id="thresh-max" required>
+                <button type="button" onclick="confirmThreshold()">Save</button>
+            </form>
+        </div>
+
+        <!-- Alerts & Maintenance Screen -->
+        <div id="alerts-screen" class="screen">
+            <div class="card">
+                <h2>Active Alerts</h2>
+                <table>
+                    <thead><tr><th>Machine</th><th>Metric</th><th>Value</th><th>Severity</th><th>Action</th></tr></thead>
+                    <tbody id="alerts-tbody"></tbody>
+                </table>
+            </div>
+            
+            <div class="card">
+                <h2>Schedule Maintenance</h2>
+                <div id="maint-msg"></div>
+                <form id="maint-form">
+                    <label>Machine ID</label>
+                    <input type="text" id="maint-machine" required>
+                    <label>Date (Unix Timestamp Future)</label>
+                    <input type="number" id="maint-date" required>
+                    <label>Description</label>
+                    <input type="text" id="maint-desc" required>
+                    <button type="submit">Schedule</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
