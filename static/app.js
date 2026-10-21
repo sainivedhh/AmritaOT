@@ -4,11 +4,6 @@ let pollInterval = null;
 
 const $ = id => document.getElementById(id);
 
-function parseJwt(token) {
-    try { return JSON.parse(atob(token.split('.')[1])); }
-    catch (e) { return null; }
-}
-
 function nav(screenId) {
     document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
     $(`${screenId}-screen`).classList.add('active');
@@ -53,9 +48,11 @@ $('login-form').addEventListener('submit', async (e) => {
         const data = await res.json();
         
         if (res.ok) {
+            if (typeof data.token !== 'string' || typeof data.role !== 'string') {
+                throw new Error('Invalid authentication response');
+            }
             token = data.token;
-            const parsed = parseJwt(token);
-            role = parsed.role;
+            role = data.role;
             
             $('login-form').reset();
             $('nav-links').style.display = 'block';
