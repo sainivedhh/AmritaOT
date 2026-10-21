@@ -72,3 +72,20 @@ def test_maintenance_rejects_boolean_timestamp(client, seed_data):
     )
     assert response.status_code == 400
     assert response.get_json()["error"] == "Invalid future date"
+
+
+
+def test_threshold_rejects_non_object_json(client, seed_data):
+    login_response = client.post(
+        "/login",
+        json={"username": "admin", "password": seed_data["admin"]},
+    )
+    token = login_response.get_json()["token"]
+    response = client.put(
+        "/thresholds",
+        data="[1, 2]",
+        content_type="application/json",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 400
+    assert response.get_json() == {"error": "Invalid JSON object"}
