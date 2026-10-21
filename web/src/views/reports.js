@@ -1,6 +1,6 @@
 import { getReports } from '../api/client.js';
 import { h } from '../shared/dom.js';
-import { renderShell, setupShellEvents } from '../shared/layout.js';
+import { mountPage } from '../shared/layout.js';
 
 function renderReportsContent(reports) {
   const rows = reports.map(r => {
@@ -40,13 +40,7 @@ function renderReportsContent(reports) {
 async function init() {
   const reports = await getReports();
   const content = renderReportsContent(reports);
-  const shell = renderShell('/reports.html', content);
-  
-  const app = document.getElementById('app');
-  app.innerHTML = '';
-  app.appendChild(shell);
-  
-  setupShellEvents();
+  mountPage('/reports.html', content);
 }
 
 init();
