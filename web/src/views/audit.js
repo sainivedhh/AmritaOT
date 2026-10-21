@@ -1,6 +1,6 @@
 import { getAuditLogs } from '../api/client.js';
 import { verifyAuditChain } from '../shared/logic.js';
-import { h } from '../shared/dom.js';
+import { h, renderTable } from '../shared/dom.js';
 import { mountPage } from '../shared/layout.js';
 
 function renderAuditContent(logs) {
@@ -36,19 +36,7 @@ function renderAuditContent(logs) {
       h('div', { style: 'margin-bottom: 1rem; font-weight: bold; color: var(--success);' }, [
         chainResult.valid ? 'Chain Status: VALID (GENESIS -> LATEST)' : 'Chain Status: TAMPERED / INVALID'
       ]),
-      h('table', { className: 'table' }, [
-        h('thead', {}, [
-          h('tr', {}, [
-            h('th', {}, ['ID']),
-            h('th', {}, ['Action']),
-            h('th', {}, ['User']),
-            h('th', {}, ['Timestamp']),
-            h('th', {}, ['Prev Hash']),
-            h('th', {}, ['Current Hash'])
-          ])
-        ]),
-        h('tbody', {}, rows)
-      ])
+      renderTable(['ID', 'Action', 'User', 'Timestamp', 'Prev Hash', 'Current Hash'], rows)
     ])
   ]);
 }
