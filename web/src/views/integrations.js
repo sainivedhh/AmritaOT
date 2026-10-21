@@ -1,5 +1,5 @@
 import { getIntegrations } from '../api/client.js';
-import { h } from '../shared/dom.js';
+import { h, renderTable } from '../shared/dom.js';
 import { mountPage } from '../shared/layout.js';
 
 function renderIntegrationsContent(items) {
@@ -17,19 +17,7 @@ function renderIntegrationsContent(items) {
   return h('div', {}, [
     h('h2', {}, ['Industrial Data Sources & Integrations']),
     h('div', { className: 'card' }, [
-      h('table', { className: 'table' }, [
-        h('thead', {}, [
-          h('tr', {}, [
-            h('th', {}, ['Integration Name']),
-            h('th', {}, ['Protocol']),
-            h('th', {}, ['Endpoint']),
-            h('th', {}, ['Status']),
-            h('th', {}, ['Latency']),
-            h('th', {}, ['Action'])
-          ])
-        ]),
-        h('tbody', {}, rows)
-      ])
+      renderTable(['Integration Name', 'Protocol', 'Endpoint', 'Status', 'Latency', 'Action'], rows)
     ])
   ]);
 }
