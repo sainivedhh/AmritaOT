@@ -1,3 +1,5 @@
+import sqlite3
+
 from src.db import get_db
 
 class Repository:
@@ -25,12 +27,7 @@ class Repository:
                 (nonce, expires_at),
             )
             db.commit()
-        except Exception as error:
-            # Only a duplicate nonce is an expected failure; surface all other DB errors.
-            import sqlite3
-
-            if not isinstance(error, sqlite3.IntegrityError):
-                raise
+        except sqlite3.IntegrityError:
             db.rollback()
             return False
         return True
