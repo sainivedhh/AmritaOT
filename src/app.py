@@ -38,7 +38,7 @@ def create_app(override_config=None):
 
     @app.errorhandler(Exception)
     def handle_exception(error):
-        app.logger.error("Unhandled application exception", exc_info=error)
+        app.logger.exception("Unhandled application exception")
         return jsonify({"error": "Internal server error"}), 500
 
     @app.errorhandler(429)
