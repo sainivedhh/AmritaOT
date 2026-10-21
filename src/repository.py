@@ -83,8 +83,12 @@ class Repository:
     @staticmethod
     def ack_alert(alert_id, ack_by):
         db = get_db()
-        db.execute("UPDATE alerts SET state = 'ACKNOWLEDGED', ack_by = ? WHERE id = ? AND state = 'OPEN'", (ack_by, alert_id))
+        cursor = db.execute(
+            "UPDATE alerts SET state = 'ACKNOWLEDGED', ack_by = ? WHERE id = ? AND state = 'OPEN'",
+            (ack_by, alert_id),
+        )
         db.commit()
+        return cursor.rowcount == 1
 
     @staticmethod
     def get_machines_status():
