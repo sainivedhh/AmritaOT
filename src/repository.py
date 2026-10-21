@@ -45,10 +45,17 @@ class Repository:
     @staticmethod
     def insert_reading(machine_id, temp, pres, vib, pwr, status, ts):
         db = get_db()
-        db.execute('''INSERT INTO sensor_readings (machine_id, temperature, pressure, vibration, power, status, ts) 
-                      VALUES (?, ?, ?, ?, ?, ?, ?)''', (machine_id, temp, pres, vib, pwr, status, ts))
-        # update machine status
-        db.execute("INSERT INTO machines (id, name, status) VALUES (?, ?, ?) ON CONFLICT(id) DO UPDATE SET status = ?", (machine_id, machine_id, status, status))
+        db.execute(
+            "INSERT INTO machines (id, name, status) VALUES (?, ?, ?) "
+            "ON CONFLICT(id) DO UPDATE SET status = excluded.status",
+            (machine_id, machine_id, status),
+        )
+        db.execute(
+            """INSERT INTO sensor_readings
+               (machine_id, temperature, pressure, vibration, power, status, ts)
+               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            (machine_id, temp, pres, vib, pwr, status, ts),
+        )
         db.commit()
 
     @staticmethod
