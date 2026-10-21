@@ -1,19 +1,23 @@
 import { getAuditLogs } from '../api/client.js';
-import { verifyAuditChain } from '../shared/logic.js';
 import { h, renderTable } from '../shared/dom.js';
 import { mountPage } from '../shared/layout.js';
 
-function renderAuditContent(logs) {
-  const chainResult = verifyAuditChain(logs);
+function renderAuditContent(auditResult) {
+  const logs = Array.isArray(auditResult?.logs) ? auditResult.logs : [];
+  const chainResult = { valid: auditResult?.valid === true };
 
-  const rows = logs.map(l => {
+  const rows = logs.map(log => {
+    const timestamp = Number.isFinite(Number(log.ts))
+      ? new Date(Number(log.ts) * 1000).toLocaleString()
+      : 'Unknown';
+
     return h('tr', {}, [
-      h('td', {}, [l.id]),
-      h('td', {}, [l.action]),
-      h('td', {}, [l.user]),
-      h('td', {}, [l.timestamp]),
-      h('td', { style: 'font-family: monospace; font-size: 0.8rem;' }, [l.prev_hash]),
-      h('td', { style: 'font-family: monospace; font-size: 0.8rem; color: var(--success);' }, [l.hash])
+      h('td', {}, [log.id]),
+      h('td', {}, [log.action]),
+      h('td', {}, [log.actor]),
+      h('td', {}, [timestamp]),
+      h('td', { style: 'font-family: monospace; font-size: 0.8rem;' }, [log.prev_hash]),
+      h('td', { style: 'font-family: monospace; font-size: 0.8rem; color: var(--success);' }, [log.hash])
     ]);
   });
 
@@ -26,7 +30,7 @@ function renderAuditContent(logs) {
           if (chainResult.valid) {
             alert(`✅ AUDIT CHAIN INTEGRITY VERIFIED: ALL ${logs.length} RECORDS ARE VALID AND UNTAMPERED.`);
           } else {
-            alert(`❌ AUDIT CHAIN INTEGRITY FAILED AT INDEX ${chainResult.brokenIndex}! TAMPERING DETECTED.`);
+            alert('❌ SERVER-SIDE AUDIT CHAIN VERIFICATION FAILED. TAMPERING MAY HAVE OCCURRED.');
           }
         }
       }, ['🔍 Verify Audit Chain'])
@@ -42,8 +46,8 @@ function renderAuditContent(logs) {
 }
 
 async function init() {
-  const logs = await getAuditLogs();
-  const content = renderAuditContent(logs);
+  const auditResult = await getAuditLogs();
+  const content = renderAuditContent(auditResult);
   mountPage('/audit.html', content);
 }
 
