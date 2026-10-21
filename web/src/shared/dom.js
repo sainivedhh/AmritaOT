@@ -26,7 +26,11 @@ export function h(tag, props = {}, children = []) {
 
     if (["href", "src", "action", "formaction", "xlink:href"].includes(attributeName)) {
       const urlValue = String(value).trim();
-      if (/^(javascript|data|vbscript):/i.test(urlValue)) {
+      // Permit only local paths, fragments, and HTTPS links for URL-bearing attributes.
+      if (
+        /^(javascript|data|vbscript):/i.test(urlValue) ||
+        /^(?:https?:)?\/\//i.test(urlValue) && !/^https:\/\//i.test(urlValue)
+      ) {
         continue;
       }
     }
