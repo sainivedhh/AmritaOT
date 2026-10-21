@@ -1,7 +1,7 @@
 import { getToken, logout } from '../shared/auth.js';
 import * as mock from './mock.js';
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
+const USE_MOCK = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true';
 const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 export async function apiCall(endpoint, options = {}) {
@@ -40,9 +40,9 @@ export async function apiCall(endpoint, options = {}) {
   return data;
 }
 
-export async function login(username, password, mfaCode) {
-  if (USE_MOCK) return mock.mockLogin(username, password, mfaCode);
-  return apiCall('/login', { method: 'POST', body: { username, password, mfaCode } });
+export async function login(username, password) {
+  // Authentication always goes through the backend, even when mock data is enabled for development.
+  return apiCall('/login', { method: 'POST', body: { username, password } });
 }
 
 export async function getMachinesStatus() {
