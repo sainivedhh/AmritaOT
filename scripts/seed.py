@@ -1,4 +1,5 @@
 import os
+import sqlite3
 import sys
 from werkzeug.security import generate_password_hash
 
@@ -34,8 +35,8 @@ def seed():
             try:
                 db.execute("INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)",
                            (u, generate_password_hash(p), r))
-            except Exception as e:
-                print(f"Skipping {u}: {e}")
+            except sqlite3.IntegrityError:
+                print(f"Skipping existing user: {u}")
                 
         # seed some machines
         machines = [('M1', 'Pump A', 'RUNNING'), ('M2', 'Compressor B', 'IDLE')]
@@ -45,8 +46,9 @@ def seed():
                 # Add default thresholds for temp and pressure
                 db.execute("INSERT INTO thresholds (machine_id, metric, min_val, max_val) VALUES (?, ?, ?, ?)", (m, 'temperature', 0, 100))
                 db.execute("INSERT INTO thresholds (machine_id, metric, min_val, max_val) VALUES (?, ?, ?, ?)", (m, 'pressure', 0, 500))
-            except Exception:
-                pass
+            except sqlite3.IntegrityError:
+                # Existing sample machine or threshold rows are left unchanged.
+                continue
                 
         db.commit()
         print("Seed complete.")
