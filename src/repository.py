@@ -17,9 +17,23 @@ class Repository:
         
     @staticmethod
     def add_nonce(nonce, expires_at):
+        """Atomically claim a nonce; return False if another request already used it."""
         db = get_db()
-        db.execute("INSERT INTO seen_nonces (nonce, expires_at) VALUES (?, ?)", (nonce, expires_at))
-        db.commit()
+        try:
+            db.execute(
+                "INSERT INTO seen_nonces (nonce, expires_at) VALUES (?, ?)",
+                (nonce, expires_at),
+            )
+            db.commit()
+        except Exception as error:
+            # Only a duplicate nonce is an expected failure; surface all other DB errors.
+            import sqlite3
+
+            if not isinstance(error, sqlite3.IntegrityError):
+                raise
+            db.rollback()
+            return False
+        return True
 
     @staticmethod
     def cleanup_nonces(now):
