@@ -11,10 +11,27 @@ export function h(tag, props = {}, children = []) {
     }
 
     if (key === "className") {
-      el.className = value;
-    } else if (value !== null && value !== undefined) {
-      el.setAttribute(key, String(value));
+      el.className = String(value);
+      continue;
     }
+
+    if (value === null || value === undefined) {
+      continue;
+    }
+
+    const attributeName = key.toLowerCase();
+    if (attributeName === "srcdoc" || attributeName === "innerhtml" || attributeName === "outerhtml") {
+      continue;
+    }
+
+    if (["href", "src", "action", "formaction"].includes(attributeName)) {
+      const urlValue = String(value).trim();
+      if (/^(javascript|data|vbscript):/i.test(urlValue)) {
+        continue;
+      }
+    }
+
+    el.setAttribute(key, String(value));
   }
 
   const append = (item) => {
