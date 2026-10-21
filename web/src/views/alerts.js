@@ -1,6 +1,6 @@
 import { getAlerts } from '../api/client.js';
 import { getRole } from '../shared/auth.js';
-import { h } from '../shared/dom.js';
+import { h, renderTable } from '../shared/dom.js';
 import { mountPage } from '../shared/layout.js';
 
 function renderAlertsContent(alerts) {
@@ -29,20 +29,7 @@ function renderAlertsContent(alerts) {
   return h('div', {}, [
     h('h2', {}, ['Active System Alerts & Incidents']),
     h('div', { className: 'card' }, [
-      h('table', { className: 'table' }, [
-        h('thead', {}, [
-          h('tr', {}, [
-            h('th', {}, ['Machine ID']),
-            h('th', {}, ['Metric']),
-            h('th', {}, ['Current Value']),
-            h('th', {}, ['Severity']),
-            h('th', {}, ['State']),
-            h('th', {}, ['Timestamp']),
-            h('th', {}, ['Action'])
-          ])
-        ]),
-        h('tbody', {}, rows)
-      ])
+      renderTable(['Machine ID', 'Metric', 'Current Value', 'Severity', 'State', 'Timestamp', 'Action'], rows)
     ])
   ]);
 }
