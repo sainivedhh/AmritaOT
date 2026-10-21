@@ -113,6 +113,7 @@ def create_app(override_config=None):
         )
         return jsonify({"status": "Scheduled"}), 201
 
+    @app.route("/maintenance/workorders", methods=["GET"])
     @app.route("/maintenance", methods=["GET"])
     @auth.require_role("admin", "engineer", "auditor")
     def get_maintenance():
@@ -126,21 +127,29 @@ def create_app(override_config=None):
         valid = audit.verify_chain(logs)
         return jsonify({"valid": valid, "logs": logs, "valid_chain": valid})
 
-    @app.route("/rules", methods=["GET"])
-    @auth.require_role("admin", "engineer", "auditor")
-    def list_rules():
-        return jsonify([
-            {
-                "id": "r1",
-                "name": "Overheat Alert",
-                "machine": "CNC-Mill-01",
-                "metric": "temperature",
-                "operator": ">",
-                "threshold": 80,
-                "severity": "HIGH",
-                "enabled": True,
-            }
-        ])
+    def register_static_get(path, endpoint, payload, roles):
+        def view():
+            return jsonify(payload)
+
+        view.__name__ = endpoint
+        protected_view = auth.require_role(*roles)(view)
+        app.add_url_rule(path, endpoint, protected_view, methods=["GET"])
+
+    register_static_get(
+        "/rules",
+        "list_rules",
+        [{
+            "id": "r1",
+            "name": "Overheat Alert",
+            "machine": "CNC-Mill-01",
+            "metric": "temperature",
+            "operator": ">",
+            "threshold": 80,
+            "severity": "HIGH",
+            "enabled": True,
+        }],
+        ("admin", "engineer", "auditor"),
+    )
 
     @app.route("/rules", methods=["POST"])
     @auth.require_role("admin", "engineer")
@@ -157,67 +166,62 @@ def create_app(override_config=None):
         audit.log_event(auth.g.user, "delete_rule", {"rule_id": rule_id})
         return jsonify({"success": True}), 200
 
-    @app.route("/notifications", methods=["GET"])
-    @auth.require_role("admin", "engineer", "auditor")
-    def list_notifications():
-        return jsonify([
-            {
-                "id": "n1",
-                "title": "Overheat Warning",
-                "message": "CNC-Mill-01 temp exceeded 80°C",
-                "severity": "HIGH",
-                "read": False,
-            }
-        ])
+    register_static_get(
+        "/notifications",
+        "list_notifications",
+        [{
+            "id": "n1",
+            "title": "Overheat Warning",
+            "message": "CNC-Mill-01 temp exceeded 80°C",
+            "severity": "HIGH",
+            "read": False,
+        }],
+        ("admin", "engineer", "auditor"),
+    )
 
     @app.route("/notifications/<notification_id>/read", methods=["POST"])
     @auth.require_role("admin", "engineer", "auditor")
     def mark_notification_read(notification_id):
         return jsonify({"success": True}), 200
 
-    @app.route("/maintenance/workorders", methods=["GET"])
-    @auth.require_role("admin", "engineer", "auditor")
-    def get_workorders():
-        return jsonify(Repository.get_maintenance())
+    register_static_get(
+        "/thresholds/versions",
+        "get_threshold_versions",
+        [{
+            "version": "v2.1",
+            "proposed_by": "engineer",
+            "approved_by": "auditor",
+            "status": "APPROVED",
+            "changes": "Updated temp limit to 85°C",
+        }],
+        ("admin", "auditor"),
+    )
 
-    @app.route("/thresholds/versions", methods=["GET"])
-    @auth.require_role("admin", "auditor")
-    def get_threshold_versions():
-        return jsonify([
-            {
-                "version": "v2.1",
-                "proposed_by": "engineer",
-                "approved_by": "auditor",
-                "status": "APPROVED",
-                "changes": "Updated temp limit to 85°C",
-            }
-        ])
+    register_static_get(
+        "/integrations",
+        "get_integrations",
+        [{
+            "id": "opc-1",
+            "name": "Plant A OPC-UA Server",
+            "type": "OPC-UA",
+            "endpoint": "opc.tcp://192.168.1.10:4840",
+            "status": "Connected",
+            "latency": "12ms",
+        }],
+        ("admin", "engineer", "auditor"),
+    )
 
-    @app.route("/integrations", methods=["GET"])
-    @auth.require_role("admin", "engineer", "auditor")
-    def get_integrations():
-        return jsonify([
-            {
-                "id": "opc-1",
-                "name": "Plant A OPC-UA Server",
-                "type": "OPC-UA",
-                "endpoint": "opc.tcp://192.168.1.10:4840",
-                "status": "Connected",
-                "latency": "12ms",
-            }
-        ])
-
-    @app.route("/reports", methods=["GET"])
-    @auth.require_role("admin", "engineer", "auditor")
-    def get_reports():
-        return jsonify([
-            {
-                "id": "rep-101",
-                "title": "IEC 62443 Security Compliance Pack",
-                "format": "PDF",
-                "generated": "2026-10-01",
-                "size": "2.4 MB",
-            }
-        ])
+    register_static_get(
+        "/reports",
+        "get_reports",
+        [{
+            "id": "rep-101",
+            "title": "IEC 62443 Security Compliance Pack",
+            "format": "PDF",
+            "generated": "2026-10-01",
+            "size": "2.4 MB",
+        }],
+        ("admin", "engineer", "auditor"),
+    )
 
     return app
