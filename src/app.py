@@ -22,7 +22,7 @@ def create_app(override_config=None):
 
     @app.after_request
     def set_security_headers(response):
-        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'; style-src 'self'"
+        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "no-referrer"
