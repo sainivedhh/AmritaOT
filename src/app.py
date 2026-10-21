@@ -197,6 +197,7 @@ def create_app(override_config=None):
     @app.route("/notifications/<notification_id>/read", methods=["POST"])
     @auth.require_role("admin", "engineer", "auditor")
     def mark_notification_read(notification_id):
+        audit.log_event(auth.g.user, "notification_read", {"notification_id": notification_id})
         return jsonify({"success": True}), 200
 
     register_protected_get(
