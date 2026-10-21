@@ -1,7 +1,7 @@
 import { getAuditLogs } from '../api/client.js';
 import { verifyAuditChain } from '../shared/logic.js';
 import { h } from '../shared/dom.js';
-import { renderShell, setupShellEvents } from '../shared/layout.js';
+import { mountPage } from '../shared/layout.js';
 
 function renderAuditContent(logs) {
   const chainResult = verifyAuditChain(logs);
@@ -56,13 +56,7 @@ function renderAuditContent(logs) {
 async function init() {
   const logs = await getAuditLogs();
   const content = renderAuditContent(logs);
-  const shell = renderShell('/audit.html', content);
-  
-  const app = document.getElementById('app');
-  app.innerHTML = '';
-  app.appendChild(shell);
-  
-  setupShellEvents();
+  mountPage('/audit.html', content);
 }
 
 init();
