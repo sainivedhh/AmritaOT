@@ -24,7 +24,7 @@ export function h(tag, props = {}, children = []) {
       continue;
     }
 
-    if (["href", "src", "action", "formaction"].includes(attributeName)) {
+    if (["href", "src", "action", "formaction", "xlink:href"].includes(attributeName)) {
       const urlValue = String(value).trim();
       if (/^(javascript|data|vbscript):/i.test(urlValue)) {
         continue;
