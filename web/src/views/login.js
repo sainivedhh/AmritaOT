@@ -32,7 +32,10 @@ if (loginForm) {
         
         try {
             const data = await api.login(u, p);
-            setToken(data.token);
+            if (typeof data.token !== 'string' || typeof data.role !== 'string') {
+                throw new Error('Invalid authentication response');
+            }
+            setToken(data.token, data.role);
             
             if (btnLabel && submitBtn) {
                 btnLabel.textContent = 'SESSION GRANTED • DISPATCHING TO CONSOLE...';
