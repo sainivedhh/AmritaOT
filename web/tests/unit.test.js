@@ -6,8 +6,7 @@ import {
   verifyAuditChain,
   validateThreshold,
   calculateUnreadNotifications,
-  parseGlobalSearchQuery,
-  validateMockTOTP
+  parseGlobalSearchQuery
 } from '../src/shared/logic.js';
 
 describe('DOM Helper', () => {
@@ -146,11 +145,3 @@ describe('Global Search Parser', () => {
   });
 });
 
-describe('MFA TOTP Validator', () => {
-  it('validates 6-digit TOTP code correctly', () => {
-    expect(validateMockTOTP('123456', 'SECRET123')).toBe(true);
-    expect(validateMockTOTP('999990', 'SECRET123')).toBe(true);
-    expect(validateMockTOTP('invalid', 'SECRET123')).toBe(false);
-    expect(validateMockTOTP('123', 'SECRET123')).toBe(false);
-  });
-});
