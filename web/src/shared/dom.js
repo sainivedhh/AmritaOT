@@ -31,3 +31,13 @@ export function h(tag, props = {}, children = []) {
   append(children);
   return el;
 }
+
+
+export function renderTable(headers, rows, className = "table") {
+  return h("table", { className }, [
+    h("thead", {}, [
+      h("tr", {}, headers.map((header) => h("th", {}, [header]))),
+    ]),
+    h("tbody", {}, rows),
+  ]);
+}
