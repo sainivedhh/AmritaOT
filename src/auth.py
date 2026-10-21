@@ -51,7 +51,7 @@ def login(request):
         algorithm="HS256",
     )
     log_event(username, "login_success", {})
-    return jsonify({"token": token})
+    return jsonify({"token": token, "role": user["role"]})
 
 
 def require_role(*allowed_roles):
