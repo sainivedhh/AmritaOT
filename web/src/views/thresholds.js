@@ -1,6 +1,6 @@
 import { getThresholdVersions } from '../api/client.js';
 import { h } from '../shared/dom.js';
-import { renderShell, setupShellEvents } from '../shared/layout.js';
+import { mountPage } from '../shared/layout.js';
 
 function renderThresholdsContent(versions) {
   const rows = versions.map(v => {
@@ -41,13 +41,7 @@ function renderThresholdsContent(versions) {
 async function init() {
   const versions = await getThresholdVersions();
   const content = renderThresholdsContent(versions);
-  const shell = renderShell('/thresholds.html', content);
-  
-  const app = document.getElementById('app');
-  app.innerHTML = '';
-  app.appendChild(shell);
-  
-  setupShellEvents();
+  mountPage('/thresholds.html', content);
 }
 
 init();
