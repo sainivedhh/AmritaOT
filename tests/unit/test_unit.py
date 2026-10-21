@@ -35,3 +35,13 @@ def test_plausibility():
     new_bad = {"temperature": 150.0} # jump of 100 > max ROC 50
     assert check_plausibility(last, new_good) == True
     assert check_plausibility(last, new_bad) == False
+
+
+
+@pytest.mark.parametrize("status", [None, 1, [], {}])
+def test_payload_rejects_non_string_status(status):
+    assert validate_payload({"status": status}) == "Invalid status"
+
+
+def test_boolean_sensor_value_is_rejected():
+    assert validate_metric("temperature", True) is False
