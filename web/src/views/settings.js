@@ -1,5 +1,5 @@
 import { h } from '../shared/dom.js';
-import { renderShell, setupShellEvents } from '../shared/layout.js';
+import { mountPage } from '../shared/layout.js';
 
 function renderSettingsContent() {
   return h('div', {}, [
@@ -29,13 +29,7 @@ function renderSettingsContent() {
 
 async function init() {
   const content = renderSettingsContent();
-  const shell = renderShell('/settings.html', content);
-  
-  const app = document.getElementById('app');
-  app.innerHTML = '';
-  app.appendChild(shell);
-  
-  setupShellEvents();
+  mountPage('/settings.html', content);
 }
 
 init();
