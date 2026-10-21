@@ -11,8 +11,18 @@ def log_event(actor, action, details):
     last = db.execute("SELECT hash FROM audit_log ORDER BY id DESC LIMIT 1").fetchone()
     prev_hash = last['hash'] if last else "0"
     
-    data_to_hash = f"{prev_hash}{ts}{actor}{action}{details_str}"
-    current_hash = hashlib.sha256(data_to_hash.encode('utf-8')).hexdigest()
+    data_to_hash = json.dumps(
+        {
+            "prev_hash": prev_hash,
+            "ts": ts,
+            "actor": actor,
+            "action": action,
+            "details": details_str,
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    current_hash = hashlib.sha256(data_to_hash.encode("utf-8")).hexdigest()
     
     db.execute("INSERT INTO audit_log (ts, actor, action, details, prev_hash, hash) VALUES (?, ?, ?, ?, ?, ?)",
                (ts, actor, action, details_str, prev_hash, current_hash))
@@ -30,8 +40,18 @@ def verify_chain(logs):
         if entry['prev_hash'] != expected_prev:
             return False
             
-        data_to_hash = f"{entry['prev_hash']}{entry['ts']}{entry['actor']}{entry['action']}{entry['details']}"
-        expected_hash = hashlib.sha256(data_to_hash.encode('utf-8')).hexdigest()
+        data_to_hash = json.dumps(
+            {
+                "prev_hash": entry["prev_hash"],
+                "ts": entry["ts"],
+                "actor": entry["actor"],
+                "action": entry["action"],
+                "details": entry["details"],
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        expected_hash = hashlib.sha256(data_to_hash.encode("utf-8")).hexdigest()
         
         if entry['hash'] != expected_hash:
             return False
