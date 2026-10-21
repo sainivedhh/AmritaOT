@@ -181,10 +181,10 @@ def create_app(override_config=None):
         audit.log_event(auth.g.user, "delete_rule", {"rule_id": rule_id})
         return jsonify({"success": True}), 200
 
-    register_static_get(
+    register_protected_get(
         "/notifications",
         "list_notifications",
-        [{
+        lambda: [{
             "id": "n1",
             "title": "Overheat Warning",
             "message": "CNC-Mill-01 temp exceeded 80°C",
@@ -199,10 +199,10 @@ def create_app(override_config=None):
     def mark_notification_read(notification_id):
         return jsonify({"success": True}), 200
 
-    register_static_get(
+    register_protected_get(
         "/thresholds/versions",
         "get_threshold_versions",
-        [{
+        lambda: [{
             "version": "v2.1",
             "proposed_by": "engineer",
             "approved_by": "auditor",
@@ -212,10 +212,10 @@ def create_app(override_config=None):
         ("admin", "auditor"),
     )
 
-    register_static_get(
+    register_protected_get(
         "/integrations",
         "get_integrations",
-        [{
+        lambda: [{
             "id": "opc-1",
             "name": "Plant A OPC-UA Server",
             "type": "OPC-UA",
@@ -226,10 +226,10 @@ def create_app(override_config=None):
         ("admin", "engineer", "auditor"),
     )
 
-    register_static_get(
+    register_protected_get(
         "/reports",
         "get_reports",
-        [{
+        lambda: [{
             "id": "rep-101",
             "title": "IEC 62443 Security Compliance Pack",
             "format": "PDF",
