@@ -1,5 +1,5 @@
 import { h } from '../shared/dom.js';
-import { renderShell, setupShellEvents } from '../shared/layout.js';
+import { mountPage } from '../shared/layout.js';
 
 function renderUsersContent() {
   const rbacMatrix = [
@@ -61,13 +61,7 @@ function renderUsersContent() {
 
 async function init() {
   const content = renderUsersContent();
-  const shell = renderShell('/users.html', content);
-  
-  const app = document.getElementById('app');
-  app.innerHTML = '';
-  app.appendChild(shell);
-  
-  setupShellEvents();
+  mountPage('/users.html', content);
 }
 
 init();
