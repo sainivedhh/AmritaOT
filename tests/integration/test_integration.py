@@ -37,3 +37,38 @@ def test_threshold_admin_update(client, seed_data):
     assert res.status_code == 200
     logs = res.get_json()['logs']
     assert any(log['action'] == 'threshold_updated' for log in logs)
+
+
+
+def test_malformed_bearer_token_returns_401(client, seed_data):
+    response = client.get(
+        "/machines/status",
+        headers={"Authorization": "Bearer not-a-valid-jwt"},
+    )
+    assert response.status_code == 401
+    assert response.get_json() == {"error": "Invalid token"}
+
+
+def test_login_rejects_non_object_json(client):
+    response = client.post("/login", data="[1, 2, 3]", content_type="application/json")
+    assert response.status_code == 401
+    assert response.get_json() == {"error": "Invalid credentials"}
+
+
+def test_maintenance_rejects_boolean_timestamp(client, seed_data):
+    login_response = client.post(
+        "/login",
+        json={"username": "engineer", "password": "engpass"},
+    )
+    token = login_response.get_json()["token"]
+    response = client.post(
+        "/maintenance",
+        json={
+            "machine_id": "M1",
+            "scheduled_for": True,
+            "description": "Routine inspection",
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 400
+    assert response.get_json()["error"] == "Invalid future date"
