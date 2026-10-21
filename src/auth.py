@@ -17,7 +17,14 @@ def login(request):
 
     username = data.get("username")
     password = data.get("password")
-    if not isinstance(username, str) or not username or not isinstance(password, str) or not password:
+    if (
+        not isinstance(username, str)
+        or not username
+        or len(username) > 128
+        or not isinstance(password, str)
+        or not password
+        or len(password) > 1024
+    ):
         return jsonify({"error": "Invalid credentials"}), 401
 
     user = Repository.get_user_by_username(username)
