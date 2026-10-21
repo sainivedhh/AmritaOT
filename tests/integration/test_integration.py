@@ -58,7 +58,7 @@ def test_login_rejects_non_object_json(client):
 def test_maintenance_rejects_boolean_timestamp(client, seed_data):
     login_response = client.post(
         "/login",
-        json={"username": "engineer", "password": "engpass"},
+        json={"username": "engineer", "password": seed_data["engineer"]},
     )
     token = login_response.get_json()["token"]
     response = client.post(
