@@ -20,11 +20,14 @@ def evaluate_all_metrics(machine_id, data, ts):
                     log_event('system', 'alert_created', {"machine": machine_id, "metric": metric, "val": val})
 
 def update_threshold(request):
-    data = request.json or {}
-    machine_id = data.get('machine_id')
-    metric = data.get('metric')
-    min_val = data.get('min_val')
-    max_val = data.get('max_val')
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"error": "Invalid JSON object"}), 400
+
+    machine_id = data.get("machine_id")
+    metric = data.get("metric")
+    min_val = data.get("min_val")
+    max_val = data.get("max_val")
     
     if not machine_id or not re.match(r'^[a-zA-Z0-9_-]+$', machine_id):
         return jsonify({"error": "Invalid machine_id"}), 400
