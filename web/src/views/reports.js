@@ -1,5 +1,5 @@
 import { getReports } from '../api/client.js';
-import { h } from '../shared/dom.js';
+import { h, renderTable } from '../shared/dom.js';
 import { mountPage } from '../shared/layout.js';
 
 function renderReportsContent(reports) {
@@ -20,19 +20,7 @@ function renderReportsContent(reports) {
       h('button', { className: 'primary-btn', onClick: () => alert("Generating IEC 62443 Compliance Pack...") }, ['+ Generate New Report'])
     ]),
     h('div', { className: 'card' }, [
-      h('table', { className: 'table' }, [
-        h('thead', {}, [
-          h('tr', {}, [
-            h('th', {}, ['ID']),
-            h('th', {}, ['Title']),
-            h('th', {}, ['Format']),
-            h('th', {}, ['Generated Date']),
-            h('th', {}, ['File Size']),
-            h('th', {}, ['Action'])
-          ])
-        ]),
-        h('tbody', {}, rows)
-      ])
+      renderTable(["ID","Title","Format","Generated Date","File Size","Action"], rows)
     ])
   ]);
 }
