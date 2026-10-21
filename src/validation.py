@@ -20,7 +20,10 @@ VALID_STATUS = {'RUNNING', 'IDLE', 'FAULT', 'STOPPED'}
 def validate_metric(name, value):
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         return False
-    if not math.isfinite(value):
+    try:
+        if not math.isfinite(value):
+            return False
+    except (OverflowError, TypeError, ValueError):
         return False
     if name in RANGES:
         min_v, max_v = RANGES[name]
