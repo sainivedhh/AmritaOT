@@ -48,7 +48,7 @@ def check_plausibility(last_reading, new_reading):
     if not last_reading:
         return True
 
-    for k in ['temperature', 'pressure', 'vibration', 'power']:
+    for k in RANGES:
         if k not in new_reading:
             continue
 
