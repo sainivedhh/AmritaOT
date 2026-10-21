@@ -91,3 +91,14 @@ export function setupShellEvents() {
   const logoutBtn = document.getElementById('logout-btn');
   if (logoutBtn) logoutBtn.addEventListener('click', logout);
 }
+
+
+export function mountPage(activePath, pageContent) {
+  const app = document.getElementById("app");
+  if (!app) {
+    throw new Error("Application root element was not found");
+  }
+
+  app.replaceChildren(renderShell(activePath, pageContent));
+  setupShellEvents();
+}
