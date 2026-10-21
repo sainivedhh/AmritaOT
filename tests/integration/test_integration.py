@@ -99,3 +99,19 @@ def test_login_rejects_oversized_credentials(client):
     )
     assert response.status_code == 401
     assert response.get_json() == {"error": "Invalid credentials"}
+
+
+
+def test_threshold_rejects_oversized_integer(client, seed_data):
+    login_response = client.post(
+        "/login",
+        json={"username": "admin", "password": seed_data["admin"]},
+    )
+    token = login_response.get_json()["token"]
+    response = client.put(
+        "/thresholds",
+        json={"machine_id": "M1", "metric": "temperature", "min_val": 0, "max_val": 10**1000},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 400
+    assert response.get_json() == {"error": "Invalid min/max range"}
