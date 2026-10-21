@@ -1,7 +1,14 @@
 export let token = null;
+let role = null;
 
-export function setToken(newToken) {
+export function setToken(newToken, newRole) {
   token = newToken;
+  if (typeof newRole === "string" && newRole.trim()) {
+    const normalized = newRole.trim().toLowerCase();
+    role = normalized.charAt(0).toUpperCase() + normalized.slice(1);
+  } else {
+    role = null;
+  }
 }
 
 export function getToken() {
@@ -9,16 +16,11 @@ export function getToken() {
 }
 
 export function getRole() {
-  if (!token) return null;
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.role;
-  } catch (e) {
-    return null;
-  }
+  return role;
 }
 
 export function logout() {
   token = null;
-  window.location.href = '/index.html';
+  role = null;
+  window.location.href = "/index.html";
 }
