@@ -77,8 +77,8 @@ export function validateThreshold(metric, minVal, maxVal) {
   const min = Number(minVal);
   const max = Number(maxVal);
 
-  if (isNaN(min) || isNaN(max)) {
-    return { valid: false, error: 'Threshold values must be numbers' };
+  if (!Number.isFinite(min) || !Number.isFinite(max)) {
+    return { valid: false, error: 'Threshold values must be finite numbers' };
   }
   if (min >= max) {
     return { valid: false, error: 'Min value must be strictly less than Max value' };
