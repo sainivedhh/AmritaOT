@@ -57,3 +57,26 @@ def test_audit_chain_uses_structured_hashing(app):
         log_event("alice", "edit", {"action": "create", "details": "xaliceedit"})
         log_event("bob", "view", {"action": "read", "details": "ybobview"})
         assert verify_chain(get_all()) is True
+
+
+
+def test_audit_verifier_accepts_existing_legacy_entries(app):
+    import hashlib
+    import time
+
+    with app.app_context():
+        ts = time.time()
+        actor = "legacy-user"
+        action = "legacy-action"
+        details = '{"legacy": true}'
+        previous_hash = "0"
+        old_serialization = f"{previous_hash}{ts}{actor}{action}{details}"
+        old_hash = hashlib.sha256(old_serialization.encode("utf-8")).hexdigest()
+        assert verify_chain([{
+            "prev_hash": previous_hash,
+            "ts": ts,
+            "actor": actor,
+            "action": action,
+            "details": details,
+            "hash": old_hash,
+        }]) is True
