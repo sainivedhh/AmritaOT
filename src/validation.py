@@ -33,7 +33,7 @@ def validate_payload(data):
     if not isinstance(data, dict):
         return "Payload must be JSON object"
 
-    for k in ['temperature', 'pressure', 'vibration', 'power']:
+    for k in RANGES:
         if k in data and not validate_metric(k, data[k]):
             return f"Invalid value for {k}"
 
