@@ -52,8 +52,16 @@ def verify_chain(logs):
             separators=(",", ":"),
         )
         expected_hash = hashlib.sha256(data_to_hash.encode("utf-8")).hexdigest()
-        
-        if entry['hash'] != expected_hash:
+        if entry["hash"] == expected_hash:
+            continue
+
+        # Allow logs written by the previous concatenation-based format to remain verifiable.
+        legacy_data = (
+            f"{entry['prev_hash']}{entry['ts']}{entry['actor']}"
+            f"{entry['action']}{entry['details']}"
+        )
+        legacy_hash = hashlib.sha256(legacy_data.encode("utf-8")).hexdigest()
+        if entry["hash"] != legacy_hash:
             return False
             
     return True
