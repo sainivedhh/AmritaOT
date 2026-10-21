@@ -50,3 +50,10 @@ def test_boolean_sensor_value_is_rejected():
 def test_oversized_integer_sensor_value_is_rejected():
     assert validate_metric("temperature", 10**1000) is False
     assert validate_payload({"temperature": 10**1000, "status": "RUNNING"}) == "Invalid value for temperature"
+
+
+def test_audit_chain_uses_structured_hashing(app):
+    with app.app_context():
+        log_event("alice", "edit", {"action": "create", "details": "xaliceedit"})
+        log_event("bob", "view", {"action": "read", "details": "ybobview"})
+        assert verify_chain(get_all()) is True
