@@ -43,7 +43,11 @@ def update_threshold(request):
     ):
         return jsonify({"error": "Invalid min/max"}), 400
         
-    if not math.isfinite(min_val) or not math.isfinite(max_val) or min_val >= max_val:
+    try:
+        valid_range = math.isfinite(min_val) and math.isfinite(max_val) and min_val < max_val
+    except (OverflowError, TypeError, ValueError):
+        valid_range = False
+    if not valid_range:
         return jsonify({"error": "Invalid min/max range"}), 400
         
     if not Repository.machine_exists(machine_id):
