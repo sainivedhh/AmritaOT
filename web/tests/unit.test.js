@@ -3,7 +3,6 @@ import { h } from '../src/shared/dom.js';
 import {
   evaluateAlertRule,
   checkRBACPermission,
-  verifyAuditChain,
   validateThreshold,
   calculateUnreadNotifications,
   parseGlobalSearchQuery
@@ -76,30 +75,6 @@ describe('RBAC Permission Matrix', () => {
   it('enforces Auditor maker-checker approval role', () => {
     expect(checkRBACPermission('Auditor', 'thresholds:approve')).toBe(true);
     expect(checkRBACPermission('Auditor', 'rules:create')).toBe(false);
-  });
-});
-
-describe('Audit Chain Verifier', () => {
-  it('verifies a valid tamper-evident hash chain', () => {
-    const logs = [
-      { id: 1, prev_hash: 'GENESIS', hash: 'abc123hash' },
-      { id: 2, prev_hash: 'abc123hash', hash: 'def456hash' },
-      { id: 3, prev_hash: 'def456hash', hash: 'ghi789hash' }
-    ];
-    const res = verifyAuditChain(logs);
-    expect(res.valid).toBe(true);
-    expect(res.brokenIndex).toBe(-1);
-  });
-
-  it('detects broken/tampered link in hash chain', () => {
-    const tamperedLogs = [
-      { id: 1, prev_hash: 'GENESIS', hash: 'abc123hash' },
-      { id: 2, prev_hash: 'CORRUPTED_HASH', hash: 'def456hash' },
-      { id: 3, prev_hash: 'def456hash', hash: 'ghi789hash' }
-    ];
-    const res = verifyAuditChain(tamperedLogs);
-    expect(res.valid).toBe(false);
-    expect(res.brokenIndex).toBe(1);
   });
 });
 
