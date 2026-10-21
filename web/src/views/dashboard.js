@@ -1,6 +1,6 @@
 import { getMachinesStatus } from '../api/client.js';
 import { h } from '../shared/dom.js';
-import { renderShell, setupShellEvents } from '../shared/layout.js';
+import { mountPage } from '../shared/layout.js';
 import { navigate } from '../shared/router.js';
 
 let allMachines = [];
@@ -118,11 +118,7 @@ function renderDashboardContent(machines) {
 
 function renderApp() {
   const content = renderDashboardContent(allMachines);
-  const shell = renderShell('/dashboard.html', content);
-  const app = document.getElementById('app');
-  app.innerHTML = '';
-  app.appendChild(shell);
-  setupShellEvents();
+  mountPage('/dashboard.html', content);
 }
 
 async function init() {
