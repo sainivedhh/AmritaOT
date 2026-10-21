@@ -1,5 +1,5 @@
 import { getThresholdVersions } from '../api/client.js';
-import { h } from '../shared/dom.js';
+import { h, renderTable } from '../shared/dom.js';
 import { mountPage } from '../shared/layout.js';
 
 function renderThresholdsContent(versions) {
@@ -21,19 +21,7 @@ function renderThresholdsContent(versions) {
   return h('div', {}, [
     h('h2', {}, ['Threshold Versioning & Maker-Checker Workflow']),
     h('div', { className: 'card' }, [
-      h('table', { className: 'table' }, [
-        h('thead', {}, [
-          h('tr', {}, [
-            h('th', {}, ['Version']),
-            h('th', {}, ['Proposed By']),
-            h('th', {}, ['Approved By']),
-            h('th', {}, ['Status']),
-            h('th', {}, ['Changes Diff']),
-            h('th', {}, ['Action'])
-          ])
-        ]),
-        h('tbody', {}, rows)
-      ])
+      renderTable(["Version","Proposed By","Approved By","Status","Changes Diff","Action"], rows)
     ])
   ]);
 }
