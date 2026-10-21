@@ -18,7 +18,7 @@ MAX_ROC = {
 VALID_STATUS = {'RUNNING', 'IDLE', 'FAULT', 'STOPPED'}
 
 def validate_metric(name, value):
-    if not isinstance(value, (int, float)):
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
         return False
     if not math.isfinite(value):
         return False
@@ -52,7 +52,7 @@ def check_plausibility(last_reading, new_reading):
         if k not in new_reading:
             continue
 
-        prev_value = last_reading.get(k) if isinstance(last_reading, dict) else last_reading.get(k)
+        prev_value = last_reading.get(k)
         new_value = new_reading.get(k)
 
         if prev_value is None or new_value is None:
