@@ -178,6 +178,8 @@ def create_app(override_config=None):
     @app.route("/rules/<rule_id>", methods=["DELETE"])
     @auth.require_role("admin", "engineer")
     def delete_rule(rule_id):
+        if not rule_id or len(rule_id) > 64:
+            return jsonify({"error": "Invalid rule id"}), 400
         audit.log_event(auth.g.user, "delete_rule", {"rule_id": rule_id})
         return jsonify({"success": True}), 200
 
