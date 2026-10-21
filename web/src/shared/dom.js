@@ -1,25 +1,33 @@
 export function h(tag, props = {}, children = []) {
   const el = document.createElement(tag);
+
   for (const [key, value] of Object.entries(props)) {
-    if (key.startsWith('on') && typeof value === 'function') {
-      el.addEventListener(key.substring(2).toLowerCase(), value);
-    } else if (key === 'className') {
+    if (key.toLowerCase().startsWith("on")) {
+      if (typeof value === "function") {
+        el.addEventListener(key.slice(2).toLowerCase(), value);
+      }
+      // Never create inline event-handler attributes from strings or other values.
+      continue;
+    }
+
+    if (key === "className") {
       el.className = value;
-    } else {
-      el.setAttribute(key, value);
+    } else if (value !== null && value !== undefined) {
+      el.setAttribute(key, String(value));
     }
   }
+
   const append = (item) => {
     if (item === null || item === undefined || item === false || item === true) return;
     if (Array.isArray(item)) {
       item.forEach(append);
-    } else if (typeof item === 'string' || typeof item === 'number') {
+    } else if (typeof item === "string" || typeof item === "number") {
       el.appendChild(document.createTextNode(String(item)));
     } else if (item instanceof Node) {
       el.appendChild(item);
     }
   };
+
   append(children);
   return el;
 }
-
