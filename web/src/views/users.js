@@ -1,4 +1,4 @@
-import { h } from '../shared/dom.js';
+import { h, renderTable } from '../shared/dom.js';
 import { mountPage } from '../shared/layout.js';
 
 function renderUsersContent() {
@@ -22,31 +22,11 @@ function renderUsersContent() {
     h('h2', {}, ['Users, RBAC Matrix & Session Management']),
     h('div', { className: 'card' }, [
       h('h3', {}, ['Role-Based Access Control (RBAC) Matrix']),
-      h('table', { className: 'table' }, [
-        h('thead', {}, [
-          h('tr', {}, [
-            h('th', {}, ['Role']),
-            h('th', {}, ['Alert Rules']),
-            h('th', {}, ['Thresholds']),
-            h('th', {}, ['User Management']),
-            h('th', {}, ['Audit Logs'])
-          ])
-        ]),
-        h('tbody', {}, rows)
-      ])
+      renderTable(["Role","Alert Rules","Thresholds","User Management","Audit Logs"], rows)
     ]),
     h('div', { className: 'card' }, [
       h('h3', {}, ['Active User Sessions']),
-      h('table', { className: 'table' }, [
-        h('thead', {}, [
-          h('tr', {}, [
-            h('th', {}, ['User']),
-            h('th', {}, ['IP Address']),
-            h('th', {}, ['Device / Browser']),
-            h('th', {}, ['Action'])
-          ])
-        ]),
-        h('tbody', {}, [
+      renderTable(['User', 'IP Address', 'Device / Browser', 'Action'], [
           h('tr', {}, [
             h('td', {}, ['admin']),
             h('td', {}, ['192.168.1.50']),
@@ -54,7 +34,6 @@ function renderUsersContent() {
             h('td', {}, [h('button', { className: 'primary-btn', style: 'background: var(--danger); padding: 0.2rem 0.5rem;' }, ['Revoke'])])
           ])
         ])
-      ])
     ])
   ]);
 }
