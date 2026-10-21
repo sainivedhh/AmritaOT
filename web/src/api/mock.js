@@ -1,13 +1,3 @@
-export async function mockLogin(username, password, mfaCode) {
-  const role = username === 'admin' ? 'Admin' : (username === 'auditor' ? 'Auditor' : 'Engineer');
-  const payload = btoa(JSON.stringify({ sub: username, role: role, exp: Math.floor(Date.now() / 1000) + 3600 }));
-  return {
-    token: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${payload}.signature`,
-    user: { username, role },
-    mfa_required: false
-  };
-}
-
 export async function mockGetMachines() {
   return [
     {
