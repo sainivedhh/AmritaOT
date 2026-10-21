@@ -1,7 +1,7 @@
 import { setToken } from '../shared/auth.js';
 import * as api from '../api/client.js';
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
+const USE_MOCK = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true';
 
 const mockBadge = document.getElementById('mock-badge');
 if (mockBadge && USE_MOCK) {
@@ -9,7 +9,7 @@ if (mockBadge && USE_MOCK) {
 }
 const demoLogins = document.getElementById('demo-logins');
 if (demoLogins) {
-    demoLogins.style.display = 'block';
+    demoLogins.style.display = USE_MOCK ? 'block' : 'none';
 }
 
 const loginForm = document.getElementById('login-form');
