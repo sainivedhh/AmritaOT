@@ -83,7 +83,7 @@ async function loadDashboard() {
         const res = await apiCall('/machines/status');
         const data = await res.json();
         const container = $('machines-container');
-        container.innerHTML = '';
+        container.replaceChildren();
         
         data.forEach(m => {
             const isStale = m.last_reading && (Date.now()/1000 - m.last_reading.ts > 30);
@@ -162,7 +162,7 @@ async function loadAlerts() {
         const res = await apiCall('/alerts');
         const alerts = await res.json();
         const tbody = $('alerts-tbody');
-        tbody.innerHTML = '';
+        tbody.replaceChildren();
         
         alerts.forEach(a => {
             if (a.state === 'OPEN') {
