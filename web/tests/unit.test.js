@@ -27,6 +27,12 @@ describe('DOM Helper', () => {
     const el = h('img', { onerror: 'alert(1)' });
     expect(el.getAttribute('onerror')).toBeNull();
   });
+
+  it('rejects dangerous URL schemes and HTML injection attributes', () => {
+    const link = h('a', { href: 'javascript:alert(1)', srcdoc: '<script>alert(1)</script>' });
+    expect(link.getAttribute('href')).toBeNull();
+    expect(link.getAttribute('srcdoc')).toBeNull();
+  });
 });
 
 describe('Alert Rule Evaluator', () => {
