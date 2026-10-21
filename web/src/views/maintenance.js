@@ -1,5 +1,5 @@
 import { getWorkOrders } from '../api/client.js';
-import { h } from '../shared/dom.js';
+import { h, renderTable } from '../shared/dom.js';
 import { mountPage } from '../shared/layout.js';
 
 function renderMaintenanceContent(orders) {
@@ -18,20 +18,7 @@ function renderMaintenanceContent(orders) {
   return h('div', {}, [
     h('h2', {}, ['Maintenance Work Orders & Inventory']),
     h('div', { className: 'card' }, [
-      h('table', { className: 'table' }, [
-        h('thead', {}, [
-          h('tr', {}, [
-            h('th', {}, ['Work Order ID']),
-            h('th', {}, ['Machine']),
-            h('th', {}, ['Priority']),
-            h('th', {}, ['Assignee']),
-            h('th', {}, ['Status']),
-            h('th', {}, ['SLA Due']),
-            h('th', {}, ['Required Parts'])
-          ])
-        ]),
-        h('tbody', {}, rows)
-      ])
+      renderTable(["Work Order ID","Machine","Priority","Assignee","Status","SLA Due","Required Parts"], rows)
     ])
   ]);
 }
