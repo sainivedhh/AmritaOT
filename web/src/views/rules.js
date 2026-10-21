@@ -1,6 +1,6 @@
 import { getRules, saveRule, deleteRule } from '../api/client.js';
 import { h } from '../shared/dom.js';
-import { renderShell, setupShellEvents } from '../shared/layout.js';
+import { mountPage } from '../shared/layout.js';
 
 let allRules = [];
 
@@ -237,11 +237,7 @@ function showCreateModal() {
 
 function renderApp() {
   const content = renderRulesContent(allRules);
-  const shell = renderShell('/rules.html', content);
-  const app = document.getElementById('app');
-  app.innerHTML = '';
-  app.appendChild(shell);
-  setupShellEvents();
+  mountPage('/rules.html', content);
 }
 
 async function init() {
