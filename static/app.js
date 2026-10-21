@@ -122,7 +122,14 @@ async function loadDashboard() {
             
             container.appendChild(card);
         });
-    } catch(e) { }
+    } catch (error) {
+        const container = $('machines-container');
+        container.replaceChildren();
+        const message = document.createElement('p');
+        message.className = 'error';
+        message.textContent = 'Unable to load machine status. Check your connection and sign in again if needed.';
+        container.appendChild(message);
+    }
 }
 
 async function confirmThreshold() {
@@ -180,7 +187,17 @@ async function loadAlerts() {
                 tbody.appendChild(tr);
             }
         });
-    } catch(e) {}
+    } catch (error) {
+        const tbody = $('alerts-tbody');
+        tbody.replaceChildren();
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 5;
+        cell.className = 'error';
+        cell.textContent = 'Unable to load alerts. Check your connection and sign in again if needed.';
+        row.appendChild(cell);
+        tbody.appendChild(row);
+    }
 }
 
 async function ackAlert(id) {
