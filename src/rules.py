@@ -31,7 +31,12 @@ def update_threshold(request):
     if metric not in ['temperature', 'pressure', 'vibration', 'power']:
         return jsonify({"error": "Invalid metric"}), 400
         
-    if not isinstance(min_val, (int, float)) or not isinstance(max_val, (int, float)):
+    if (
+        isinstance(min_val, bool)
+        or isinstance(max_val, bool)
+        or not isinstance(min_val, (int, float))
+        or not isinstance(max_val, (int, float))
+    ):
         return jsonify({"error": "Invalid min/max"}), 400
         
     if not math.isfinite(min_val) or not math.isfinite(max_val) or min_val >= max_val:
