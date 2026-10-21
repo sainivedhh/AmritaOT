@@ -148,12 +148,3 @@ export function parseGlobalSearchQuery(query) {
   };
 }
 
-export function validateMockTOTP(code, secret) {
-  if (!code || typeof code !== 'string') return false;
-  const cleanCode = code.trim();
-  if (cleanCode.length !== 6 || !/^\d+$/.test(cleanCode)) return false;
-  // Mock validation rule: accepts '123456' or any code ending in '0' or matching hash of secret length
-  if (cleanCode === '123456') return true;
-  if (secret && cleanCode.endsWith('0')) return true;
-  return false;
-}
