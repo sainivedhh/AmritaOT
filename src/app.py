@@ -46,6 +46,18 @@ def create_app(override_config=None):
         audit.log_event(get_remote_address(), "rate_limit_exceeded", {"path": request.path})
         return jsonify({"error": "Rate limit exceeded"}), 429
 
+    def register_protected_get(path, endpoint, provider, roles):
+        def view():
+            return jsonify(provider())
+
+        view.__name__ = endpoint
+        app.add_url_rule(
+            path,
+            endpoint,
+            auth.require_role(*roles)(view),
+            methods=["GET"],
+        )
+
     @app.route("/")
     def index():
         return app.send_static_file("index.html")
@@ -60,20 +72,24 @@ def create_app(override_config=None):
     def readings():
         return ingestion.process_reading(request)
 
-    @app.route("/machines/status", methods=["GET"])
-    @auth.require_role("admin", "engineer", "auditor")
-    def machine_status():
-        return jsonify(Repository.get_machines_status())
+    register_protected_get(
+        "/machines/status",
+        "machine_status",
+        Repository.get_machines_status,
+        ("admin", "engineer", "auditor"),
+    )
 
     @app.route("/thresholds", methods=["PUT"])
     @auth.require_role("admin")
     def update_thresholds():
         return rules.update_threshold(request)
 
-    @app.route("/alerts", methods=["GET"])
-    @auth.require_role("admin", "engineer", "auditor")
-    def get_alerts():
-        return jsonify(Repository.get_alerts())
+    register_protected_get(
+        "/alerts",
+        "get_alerts",
+        Repository.get_alerts,
+        ("admin", "engineer", "auditor"),
+    )
 
     @app.route("/alerts/<int:alert_id>/acknowledge", methods=["POST"])
     @auth.require_role("admin", "engineer")
@@ -113,11 +129,18 @@ def create_app(override_config=None):
         )
         return jsonify({"status": "Scheduled"}), 201
 
-    @app.route("/maintenance/workorders", methods=["GET"])
-    @app.route("/maintenance", methods=["GET"])
-    @auth.require_role("admin", "engineer", "auditor")
-    def get_maintenance():
-        return jsonify(Repository.get_maintenance())
+    register_protected_get(
+        "/maintenance",
+        "get_maintenance",
+        Repository.get_maintenance,
+        ("admin", "engineer", "auditor"),
+    )
+    register_protected_get(
+        "/maintenance/workorders",
+        "get_workorders",
+        Repository.get_maintenance,
+        ("admin", "engineer", "auditor"),
+    )
 
     @app.route("/audit", methods=["GET"])
     @app.route("/audit/verify", methods=["GET"])
@@ -127,18 +150,10 @@ def create_app(override_config=None):
         valid = audit.verify_chain(logs)
         return jsonify({"valid": valid, "logs": logs, "valid_chain": valid})
 
-    def register_static_get(path, endpoint, payload, roles):
-        def view():
-            return jsonify(payload)
-
-        view.__name__ = endpoint
-        protected_view = auth.require_role(*roles)(view)
-        app.add_url_rule(path, endpoint, protected_view, methods=["GET"])
-
-    register_static_get(
+    register_protected_get(
         "/rules",
         "list_rules",
-        [{
+        lambda: [{
             "id": "r1",
             "name": "Overheat Alert",
             "machine": "CNC-Mill-01",
