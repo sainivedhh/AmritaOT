@@ -20,7 +20,7 @@ def simulate(device_id, secret, bad_sig=False, out_of_range=False):
     ts = str(time.time())
     nonce = f"sim-{time.time_ns()}"
     
-    actual_secret = b"wrong-secret" if bad_sig else secret.encode('utf-8')
+    actual_secret = b"" if bad_sig else secret.encode("utf-8")
     data_to_sign = f"{device_id}{ts}{nonce}{payload_str}".encode('utf-8')
     signature = hmac.new(actual_secret, data_to_sign, hashlib.sha256).hexdigest()
     
@@ -34,10 +34,10 @@ def simulate(device_id, secret, bad_sig=False, out_of_range=False):
     
     print(f"Sending reading for {device_id}...")
     try:
-        res = requests.post("http://localhost:5000/readings", data=payload_str, headers=headers)
+        res = requests.post("http://127.0.0.1:5000/readings", data=payload_str, headers=headers, timeout=5)
         print(f"Response: {res.status_code} - {res.text}")
-    except Exception as e:
-        print(f"Failed to connect: {e}")
+    except requests.RequestException:
+        print("Failed to connect to the local AmritaOT API.")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
