@@ -2,13 +2,14 @@ from flask import jsonify, request, g
 import re
 from src.repository import Repository
 from src.audit import log_event
+from src.validation import RANGES
 import math
 
 def evaluate_all_metrics(machine_id, data, ts):
     thresholds = Repository.get_thresholds(machine_id)
     t_map = {t['metric']: t for t in thresholds}
     
-    for metric in ['temperature', 'pressure', 'vibration', 'power']:
+    for metric in RANGES:
         if metric in data and metric in t_map:
             val = data[metric]
             t = t_map[metric]
@@ -28,7 +29,7 @@ def update_threshold(request):
     if not machine_id or not re.match(r'^[a-zA-Z0-9_-]+$', machine_id):
         return jsonify({"error": "Invalid machine_id"}), 400
         
-    if metric not in ['temperature', 'pressure', 'vibration', 'power']:
+    if metric not in RANGES:
         return jsonify({"error": "Invalid metric"}), 400
         
     if (
