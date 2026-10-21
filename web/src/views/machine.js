@@ -1,6 +1,6 @@
 import { getMachinesStatus } from '../api/client.js';
 import { h } from '../shared/dom.js';
-import { renderShell, setupShellEvents } from '../shared/layout.js';
+import { mountPage } from '../shared/layout.js';
 import { navigate } from '../shared/router.js';
 
 let allMachines = [];
@@ -124,11 +124,7 @@ function renderMachineHealthContent(machines) {
 
 function renderApp() {
   const content = renderMachineHealthContent(allMachines);
-  const shell = renderShell('/machine.html', content);
-  const app = document.getElementById('app');
-  app.innerHTML = '';
-  app.appendChild(shell);
-  setupShellEvents();
+  mountPage('/machine.html', content);
 }
 
 async function init() {
