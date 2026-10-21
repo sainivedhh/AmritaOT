@@ -14,7 +14,7 @@ def test_login_flow(client, seed_data):
     assert res.status_code == 429
     
     # Engineer login from different remote address
-    res = client.post('/login', json={"username": "engineer", "password": "engpass"}, environ_overrides={'REMOTE_ADDR': '192.168.1.100'})
+    res = client.post('/login', json={"username": "engineer", "password": seed_data["engineer"]}, environ_overrides={'REMOTE_ADDR': '192.168.1.100'})
     assert res.status_code == 200
     token = res.get_json()['token']
     
@@ -25,7 +25,7 @@ def test_login_flow(client, seed_data):
 
 def test_threshold_admin_update(client, seed_data):
     # Admin login
-    res = client.post('/login', json={"username": "admin", "password": "adminpass"})
+    res = client.post('/login', json={"username": "admin", "password": seed_data["admin"]})
     token = res.get_json()['token']
     headers = {'Authorization': f'Bearer {token}'}
     
