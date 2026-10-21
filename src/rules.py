@@ -53,6 +53,8 @@ def update_threshold(request):
     return jsonify({"status": "Updated"}), 200
 
 def ack_alert(alert_id):
-    Repository.ack_alert(alert_id, g.user)
+    if not Repository.ack_alert(alert_id, g.user):
+        return jsonify({"error": "Open alert not found"}), 404
+
     log_event(g.user, "alert_ack", {"alert_id": alert_id})
     return jsonify({"status": "Acknowledged"}), 200
