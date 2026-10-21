@@ -1,6 +1,6 @@
 import { getWorkOrders } from '../api/client.js';
 import { h } from '../shared/dom.js';
-import { renderShell, setupShellEvents } from '../shared/layout.js';
+import { mountPage } from '../shared/layout.js';
 
 function renderMaintenanceContent(orders) {
   const rows = orders.map(o => {
@@ -39,13 +39,7 @@ function renderMaintenanceContent(orders) {
 async function init() {
   const orders = await getWorkOrders();
   const content = renderMaintenanceContent(orders);
-  const shell = renderShell('/maintenance.html', content);
-  
-  const app = document.getElementById('app');
-  app.innerHTML = '';
-  app.appendChild(shell);
-  
-  setupShellEvents();
+  mountPage('/maintenance.html', content);
 }
 
 init();
