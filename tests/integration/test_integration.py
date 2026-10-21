@@ -89,3 +89,13 @@ def test_threshold_rejects_non_object_json(client, seed_data):
     )
     assert response.status_code == 400
     assert response.get_json() == {"error": "Invalid JSON object"}
+
+
+
+def test_login_rejects_oversized_credentials(client):
+    response = client.post(
+        "/login",
+        json={"username": "u" * 129, "password": "p"},
+    )
+    assert response.status_code == 401
+    assert response.get_json() == {"error": "Invalid credentials"}
