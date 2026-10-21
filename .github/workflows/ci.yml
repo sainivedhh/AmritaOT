@@ -16,6 +16,21 @@ jobs:
         pip install -r k8s/requirements.txt
     - name: Run Pytest
       run: pytest tests/
+    - name: Set up Node.js
+      uses: actions/setup-node@v5
+      with:
+        node-version: '22'
+        cache: npm
+        cache-dependency-path: web/package-lock.json
+    - name: Install frontend dependencies
+      working-directory: web
+      run: npm ci
+    - name: Test frontend
+      working-directory: web
+      run: npm test
+    - name: Build frontend
+      working-directory: web
+      run: npm run build
     - name: Run Bandit Security Scan
       run: bandit -r src/
     - name: Upgrade setuptools to patched version
