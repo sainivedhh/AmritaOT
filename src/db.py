@@ -80,6 +80,8 @@ def init_db(db_path):
             nonce TEXT PRIMARY KEY,
             expires_at REAL NOT NULL
         );
+        CREATE INDEX IF NOT EXISTS idx_seen_nonces_expires_at
+            ON seen_nonces(expires_at);
     ''')
     conn.commit()
     conn.close()
