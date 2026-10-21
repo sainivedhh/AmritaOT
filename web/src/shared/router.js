@@ -1,48 +1,33 @@
-const VIEW_MODULES = Object.freeze({
-  "/index.html": "/src/views/login.js",
-  "/dashboard.html": "/src/views/dashboard.js",
-  "/machine.html": "/src/views/machine.js",
-  "/alerts.html": "/src/views/alerts.js",
-  "/rules.html": "/src/views/rules.js",
-  "/thresholds.html": "/src/views/thresholds.js",
-  "/maintenance.html": "/src/views/maintenance.js",
-  "/audit.html": "/src/views/audit.js",
-  "/users.html": "/src/views/users.js",
-  "/reports.html": "/src/views/reports.js",
-  "/integrations.html": "/src/views/integrations.js",
-  "/settings.html": "/src/views/settings.js",
-});
+const VIEW_PATHS = new Set([
+  "/index.html",
+  "/dashboard.html",
+  "/machine.html",
+  "/alerts.html",
+  "/rules.html",
+  "/thresholds.html",
+  "/maintenance.html",
+  "/audit.html",
+  "/users.html",
+  "/reports.html",
+  "/integrations.html",
+  "/settings.html",
+]);
 
-export async function navigate(path) {
-  const destination = new URL(path, window.location.origin);
-  const modulePath = VIEW_MODULES[destination.pathname];
-
-  if (destination.origin !== window.location.origin || !modulePath) {
+export function navigate(path) {
+  let destination;
+  try {
+    destination = new URL(path, window.location.origin);
+  } catch {
     return;
   }
 
-  const response = await fetch(destination.pathname);
-  if (!response.ok) {
-    throw new Error(`Unable to load page (${response.status})`);
+  if (destination.origin !== window.location.origin || !VIEW_PATHS.has(destination.pathname)) {
+    return;
   }
 
-  const html = await response.text();
-  const parser = new DOMParser();
-  const parsedDocument = parser.parseFromString(html, "text/html");
-
-  // Move parsed nodes into the current document without using an HTML string sink.
-  document.body.replaceChildren(...Array.from(parsedDocument.body.childNodes));
-  document.title = parsedDocument.title;
-
-  await import(`${modulePath}?t=${Date.now()}`);
-  window.history.pushState({}, "", destination.pathname);
+  // These are static multi-page routes; let the browser parse the document normally.
+  window.location.assign(destination.pathname);
 }
-
-window.addEventListener("popstate", () => {
-  navigate(window.location.pathname).catch(() => {
-    window.location.assign(window.location.pathname);
-  });
-});
 
 document.addEventListener("click", (event) => {
   if (
@@ -61,16 +46,20 @@ document.addEventListener("click", (event) => {
     return;
   }
 
-  const destination = new URL(link.href, window.location.origin);
+  let destination;
+  try {
+    destination = new URL(link.href, window.location.origin);
+  } catch {
+    return;
+  }
+
   if (
     destination.origin !== window.location.origin ||
-    !Object.hasOwn(VIEW_MODULES, destination.pathname)
+    !VIEW_PATHS.has(destination.pathname)
   ) {
     return;
   }
 
   event.preventDefault();
-  navigate(destination.pathname).catch(() => {
-    window.location.assign(destination.pathname);
-  });
+  navigate(destination.pathname);
 });
