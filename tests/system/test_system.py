@@ -26,7 +26,7 @@ def test_e2e_alert_flow(client, seed_data):
     assert res.status_code == 201
     
     # Verify alert created
-    admin_res = client.post('/login', json={"username": "admin", "password": "adminpass"})
+    admin_res = client.post('/login', json={"username": "admin", "password": seed_data["admin"]})
     token = admin_res.get_json()['token']
     auth_headers = {'Authorization': f'Bearer {token}'}
     
