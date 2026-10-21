@@ -70,27 +70,6 @@ export function checkRBACPermission(role, permission) {
   return perms.includes(permission);
 }
 
-export function verifyAuditChain(logs) {
-  if (!logs || !Array.isArray(logs) || logs.length === 0) {
-    return { valid: true, brokenIndex: -1 };
-  }
-
-  for (let i = 0; i < logs.length; i++) {
-    const log = logs[i];
-    if (i === 0) {
-      if (log.prev_hash !== 'GENESIS') {
-        return { valid: false, brokenIndex: 0 };
-      }
-    } else {
-      if (log.prev_hash !== logs[i - 1].hash) {
-        return { valid: false, brokenIndex: i };
-      }
-    }
-  }
-
-  return { valid: true, brokenIndex: -1 };
-}
-
 export function validateThreshold(metric, minVal, maxVal) {
   if (minVal === null || minVal === undefined || maxVal === null || maxVal === undefined) {
     return { valid: false, error: 'Min and Max values are required' };
