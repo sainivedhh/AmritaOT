@@ -1,6 +1,6 @@
 import { getIntegrations } from '../api/client.js';
 import { h } from '../shared/dom.js';
-import { renderShell, setupShellEvents } from '../shared/layout.js';
+import { mountPage } from '../shared/layout.js';
 
 function renderIntegrationsContent(items) {
   const rows = items.map(i => {
@@ -37,13 +37,7 @@ function renderIntegrationsContent(items) {
 async function init() {
   const items = await getIntegrations();
   const content = renderIntegrationsContent(items);
-  const shell = renderShell('/integrations.html', content);
-  
-  const app = document.getElementById('app');
-  app.innerHTML = '';
-  app.appendChild(shell);
-  
-  setupShellEvents();
+  mountPage('/integrations.html', content);
 }
 
 init();
