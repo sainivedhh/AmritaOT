@@ -24,6 +24,11 @@ describe('DOM Helper', () => {
     const el = h('span', {}, [malicious]);
     expect(el.innerHTML).toBe('&lt;script&gt;alert(1)&lt;/script&gt;');
   });
+
+  it('does not create inline event-handler attributes from strings', () => {
+    const el = h('img', { onerror: 'alert(1)' });
+    expect(el.getAttribute('onerror')).toBeNull();
+  });
 });
 
 describe('Alert Rule Evaluator', () => {
