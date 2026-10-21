@@ -37,8 +37,8 @@ def validate_payload(data):
         if k in data and not validate_metric(k, data[k]):
             return f"Invalid value for {k}"
 
-    status = data.get('status')
-    if status not in VALID_STATUS:
+    status = data.get("status")
+    if not isinstance(status, str) or status not in VALID_STATUS:
         return "Invalid status"
 
     return None
