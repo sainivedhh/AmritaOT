@@ -5,7 +5,7 @@ export function renderShell(activePath, pageContent) {
   const topHeader = h('header', { className: 'fixed top-0 left-0 right-0 h-16 w-full px-6 border-b border-slate-200 bg-white/95 backdrop-blur z-50 flex justify-between items-center select-none shadow-sm' }, [
     h('div', { className: 'flex items-center gap-6' }, [
       h('div', { className: 'flex items-center gap-3' }, [
-        h('img', { src: '/src/assets/logo.png', alt: 'AmritaOT Logo', className: 'h-8 w-auto object-contain', onerror: "this.onerror=null; this.src='https://lh3.googleusercontent.com/aida/AEtjO1VWtLOBGTe3rviRxpbTp4xN0zjlukaHppJw-2lApYIpkcHa0yYUdJcr8BaTiEwWFN4p9NtPo0KQ6YJha7f9jksZtVrTiWbvmlT8c1v3cpyWsJNEzNtS-IeAvBKBnfvLjYoEwt-LBFP_b9qaYkK0K_HUEJZDbOLDhOysS8Id4jqvtgEomoGCgeg6ztBBSptGT7dDLIF0RXj1duQKDwqMAx_TpCgj12PBI81DueBbowG9GA';" }),
+        h('img', { src: '/src/assets/logo.png', alt: 'AmritaOT Logo', className: 'h-8 w-auto object-contain' }),
         h('div', { className: 'flex flex-col' }, [
           h('span', { className: 'font-headline-md text-lg font-bold text-slate-900 tracking-tight' }, ['AmritaOT']),
           h('span', { className: 'text-[11px] text-slate-500 font-medium' }, ['Industrial Monitoring System'])
