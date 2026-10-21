@@ -45,3 +45,8 @@ def test_payload_rejects_non_string_status(status):
 
 def test_boolean_sensor_value_is_rejected():
     assert validate_metric("temperature", True) is False
+
+
+def test_oversized_integer_sensor_value_is_rejected():
+    assert validate_metric("temperature", 10**1000) is False
+    assert validate_payload({"temperature": 10**1000, "status": "RUNNING"}) == "Invalid value for temperature"
