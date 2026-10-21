@@ -111,12 +111,16 @@ def create_app(override_config=None):
             return jsonify({"error": "Invalid machine_id"}), 400
         if not Repository.machine_exists(machine_id):
             return jsonify({"error": "Machine not found"}), 404
-        if (
-            isinstance(scheduled_for, bool)
-            or not isinstance(scheduled_for, (int, float))
-            or not math.isfinite(scheduled_for)
-            or scheduled_for <= time.time()
-        ):
+        try:
+            valid_schedule = (
+                not isinstance(scheduled_for, bool)
+                and isinstance(scheduled_for, (int, float))
+                and math.isfinite(scheduled_for)
+                and scheduled_for > time.time()
+            )
+        except (OverflowError, TypeError, ValueError):
+            valid_schedule = False
+        if not valid_schedule:
             return jsonify({"error": "Invalid future date"}), 400
         if not isinstance(description, str) or not description.strip() or len(description) > 1000:
             return jsonify({"error": "Invalid description"}), 400
