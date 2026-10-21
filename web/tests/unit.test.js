@@ -32,6 +32,9 @@ describe('DOM Helper', () => {
     const link = h('a', { href: 'javascript:alert(1)', srcdoc: '<script>alert(1)</script>' });
     expect(link.getAttribute('href')).toBeNull();
     expect(link.getAttribute('srcdoc')).toBeNull();
+
+    const dataImage = h('img', { src: 'data:text/html,<script>alert(1)</script>' });
+    expect(dataImage.getAttribute('src')).toBeNull();
   });
 });
 
