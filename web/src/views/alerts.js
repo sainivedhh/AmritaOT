@@ -1,7 +1,7 @@
 import { getAlerts } from '../api/client.js';
 import { getRole } from '../shared/auth.js';
 import { h } from '../shared/dom.js';
-import { renderShell, setupShellEvents } from '../shared/layout.js';
+import { mountPage } from '../shared/layout.js';
 
 function renderAlertsContent(alerts) {
   const role = getRole();
@@ -50,13 +50,7 @@ function renderAlertsContent(alerts) {
 async function init() {
   const alerts = await getAlerts();
   const content = renderAlertsContent(alerts);
-  const shell = renderShell('/alerts.html', content);
-  
-  const app = document.getElementById('app');
-  app.innerHTML = '';
-  app.appendChild(shell);
-  
-  setupShellEvents();
+  mountPage('/alerts.html', content);
 }
 
 init();
