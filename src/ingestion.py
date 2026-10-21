@@ -14,6 +14,12 @@ from src.validation import check_plausibility, validate_payload
 def verify_signature(payload, signature, nonce, timestamp_str, device_id):
     if not all(isinstance(value, str) and value for value in (payload, signature, nonce, timestamp_str, device_id)):
         return False
+    if len(device_id) > 128 or len(nonce) > 128 or len(timestamp_str) > 32:
+        return False
+    if len(signature) != hashlib.sha256().digest_size * 2:
+        return False
+    if any(character not in "0123456789abcdefABCDEF" for character in signature):
+        return False
 
     try:
         timestamp = float(timestamp_str)
