@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+import json
 import math
 import time
 
@@ -9,6 +10,15 @@ from src import rules
 from src.audit import log_event
 from src.repository import Repository
 from src.validation import check_plausibility, validate_payload
+
+
+def canonical_signature_message(device_id, timestamp_str, nonce, payload):
+    """Serialize signed fields as a JSON array to avoid ambiguous concatenation."""
+    return json.dumps(
+        [device_id, timestamp_str, nonce, payload],
+        ensure_ascii=False,
+        separators=(",", ":"),
+    ).encode("utf-8")
 
 
 def verify_signature(payload, signature, nonce, timestamp_str, device_id):
@@ -39,7 +49,7 @@ def verify_signature(payload, signature, nonce, timestamp_str, device_id):
         return False
 
     secret = current_app.config_obj.DEVICE_HMAC_SECRET.encode("utf-8")
-    data_to_sign = f"{device_id}{timestamp_str}{nonce}{payload}".encode("utf-8")
+    data_to_sign = canonical_signature_message(device_id, timestamp_str, nonce, payload)
     expected_mac = hmac.new(secret, data_to_sign, hashlib.sha256).hexdigest()
     if not hmac.compare_digest(expected_mac, signature):
         return False
@@ -47,7 +57,8 @@ def verify_signature(payload, signature, nonce, timestamp_str, device_id):
     # Payload bytes are capped by Flask's MAX_CONTENT_LENGTH before this stage.
     # Claim the nonce atomically only after the signature is authenticated.
     Repository.cleanup_nonces(now)
-    return Repository.add_nonce(f"{device_id}:{nonce}", now + 300)
+    replay_key = json.dumps([device_id, nonce], separators=(",", ":"))
+    return Repository.add_nonce(replay_key, now + 300)
 
 
 def process_reading(request):
