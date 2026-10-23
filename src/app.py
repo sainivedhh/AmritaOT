@@ -1,7 +1,7 @@
 import math
-import time
-
 import json
+import math
+import time
 
 from flask import Flask, jsonify, request
 from werkzeug.exceptions import HTTPException
@@ -15,6 +15,47 @@ from flask_limiter.util import get_remote_address
 
 READ_ROLES = ("admin", "engineer", "auditor")
 WRITE_ROLES = ("admin", "engineer")
+ADMIN_AUDIT_ROLES = ("admin", "auditor")
+
+STATIC_RULES = [{
+    "id": "r1",
+    "name": "Overheat Alert",
+    "machine": "CNC-Mill-01",
+    "metric": "temperature",
+    "operator": ">",
+    "threshold": 80,
+    "severity": "HIGH",
+    "enabled": True,
+}]
+STATIC_NOTIFICATIONS = [{
+    "id": "n1",
+    "title": "Overheat Warning",
+    "message": "CNC-Mill-01 temp exceeded 80°C",
+    "severity": "HIGH",
+    "read": False,
+}]
+STATIC_THRESHOLD_VERSIONS = [{
+    "version": "v2.1",
+    "proposed_by": "engineer",
+    "approved_by": "auditor",
+    "status": "APPROVED",
+    "changes": "Updated temp limit to 85°C",
+}]
+STATIC_INTEGRATIONS = [{
+    "id": "opc-1",
+    "name": "Plant A OPC-UA Server",
+    "type": "OPC-UA",
+    "endpoint": "opc.tcp://192.168.1.10:4840",
+    "status": "Connected",
+    "latency": "12ms",
+}]
+STATIC_REPORTS = [{
+    "id": "rep-101",
+    "title": "IEC 62443 Security Compliance Pack",
+    "format": "PDF",
+    "generated": "2026-10-01",
+    "size": "2.4 MB",
+}]
 
 
 def create_app(override_config=None):
@@ -57,7 +98,8 @@ def create_app(override_config=None):
 
     def register_protected_get(path, endpoint, provider, roles):
         def view():
-            return jsonify(provider())
+            payload = provider() if callable(provider) else provider
+            return jsonify(payload)
 
         view.__name__ = endpoint
         app.add_url_rule(
@@ -81,24 +123,14 @@ def create_app(override_config=None):
     def readings():
         return ingestion.process_reading(request)
 
-    register_protected_get(
-        "/machines/status",
-        "machine_status",
-        Repository.get_machines_status,
-        READ_ROLES,
-    )
+
 
     @app.route("/thresholds", methods=["PUT"])
     @auth.require_role("admin")
     def update_thresholds():
         return rules.update_threshold(request)
 
-    register_protected_get(
-        "/alerts",
-        "get_alerts",
-        Repository.get_alerts,
-        ("admin", "engineer", "auditor"),
-    )
+
 
     @app.route("/alerts/<int:alert_id>/acknowledge", methods=["POST"])
     @auth.require_role(*WRITE_ROLES)
@@ -152,42 +184,17 @@ def create_app(override_config=None):
         )
         return jsonify({"status": "Scheduled"}), 201
 
-    register_protected_get(
-        "/maintenance",
-        "get_maintenance",
-        Repository.get_maintenance,
-        ("admin", "engineer", "auditor"),
-    )
-    register_protected_get(
-        "/maintenance/workorders",
-        "get_workorders",
-        Repository.get_maintenance,
-        ("admin", "engineer", "auditor"),
-    )
+
 
     @app.route("/audit", methods=["GET"])
     @app.route("/audit/verify", methods=["GET"])
-    @auth.require_role("admin", "auditor")
+    @auth.require_role(*ADMIN_AUDIT_ROLES)
     def verify_audit_chain():
         logs = audit.get_all()
         valid = audit.verify_chain(logs)
         return jsonify({"valid": valid, "logs": logs, "valid_chain": valid})
 
-    register_protected_get(
-        "/rules",
-        "list_rules",
-        lambda: [{
-            "id": "r1",
-            "name": "Overheat Alert",
-            "machine": "CNC-Mill-01",
-            "metric": "temperature",
-            "operator": ">",
-            "threshold": 80,
-            "severity": "HIGH",
-            "enabled": True,
-        }],
-        ("admin", "engineer", "auditor"),
-    )
+
 
     @app.route("/rules", methods=["POST"])
     @auth.require_role("admin", "engineer")
@@ -222,18 +229,7 @@ def create_app(override_config=None):
         audit.log_event(auth.g.user, "delete_rule", {"rule_id": rule_id})
         return jsonify({"success": True}), 200
 
-    register_protected_get(
-        "/notifications",
-        "list_notifications",
-        lambda: [{
-            "id": "n1",
-            "title": "Overheat Warning",
-            "message": "CNC-Mill-01 temp exceeded 80°C",
-            "severity": "HIGH",
-            "read": False,
-        }],
-        ("admin", "engineer", "auditor"),
-    )
+
 
     @app.route("/notifications/<notification_id>/read", methods=["POST"])
     @auth.require_role(*READ_ROLES)
@@ -241,44 +237,20 @@ def create_app(override_config=None):
         audit.log_event(auth.g.user, "notification_read", {"notification_id": notification_id})
         return jsonify({"success": True}), 200
 
-    register_protected_get(
-        "/thresholds/versions",
-        "get_threshold_versions",
-        lambda: [{
-            "version": "v2.1",
-            "proposed_by": "engineer",
-            "approved_by": "auditor",
-            "status": "APPROVED",
-            "changes": "Updated temp limit to 85°C",
-        }],
-        ("admin", "auditor"),
-    )
 
-    register_protected_get(
-        "/integrations",
-        "get_integrations",
-        lambda: [{
-            "id": "opc-1",
-            "name": "Plant A OPC-UA Server",
-            "type": "OPC-UA",
-            "endpoint": "opc.tcp://192.168.1.10:4840",
-            "status": "Connected",
-            "latency": "12ms",
-        }],
-        ("admin", "engineer", "auditor"),
-    )
 
-    register_protected_get(
-        "/reports",
-        "get_reports",
-        lambda: [{
-            "id": "rep-101",
-            "title": "IEC 62443 Security Compliance Pack",
-            "format": "PDF",
-            "generated": "2026-10-01",
-            "size": "2.4 MB",
-        }],
-        ("admin", "engineer", "auditor"),
+    protected_get_routes = (
+        ("/machines/status", "machine_status", Repository.get_machines_status, READ_ROLES),
+        ("/alerts", "get_alerts", Repository.get_alerts, READ_ROLES),
+        ("/maintenance", "get_maintenance", Repository.get_maintenance, READ_ROLES),
+        ("/maintenance/workorders", "get_workorders", Repository.get_maintenance, READ_ROLES),
+        ("/rules", "list_rules", STATIC_RULES, READ_ROLES),
+        ("/notifications", "list_notifications", STATIC_NOTIFICATIONS, READ_ROLES),
+        ("/thresholds/versions", "get_threshold_versions", STATIC_THRESHOLD_VERSIONS, ADMIN_AUDIT_ROLES),
+        ("/integrations", "get_integrations", STATIC_INTEGRATIONS, READ_ROLES),
+        ("/reports", "get_reports", STATIC_REPORTS, READ_ROLES),
     )
+    for route in protected_get_routes:
+        register_protected_get(*route)
 
     return app
