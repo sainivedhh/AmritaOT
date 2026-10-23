@@ -6,6 +6,8 @@ import hashlib
 import json
 import argparse
 
+from src.ingestion import canonical_signature_message
+
 def simulate(device_id, secret, bad_sig=False, out_of_range=False):
     payload = {
         "temperature": 150.0 if out_of_range else 45.0,
@@ -21,7 +23,7 @@ def simulate(device_id, secret, bad_sig=False, out_of_range=False):
     nonce = f"sim-{time.time_ns()}"
     
     actual_secret = b"" if bad_sig else secret.encode("utf-8")
-    data_to_sign = f"{device_id}{ts}{nonce}{payload_str}".encode('utf-8')
+    data_to_sign = canonical_signature_message(device_id, ts, nonce, payload_str)
     signature = hmac.new(actual_secret, data_to_sign, hashlib.sha256).hexdigest()
     
     headers = {
