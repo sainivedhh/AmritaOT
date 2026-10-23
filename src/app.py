@@ -16,45 +16,15 @@ READ_ROLES = ("admin", "engineer", "auditor")
 WRITE_ROLES = ("admin", "engineer")
 ADMIN_AUDIT_ROLES = ("admin", "auditor")
 
-STATIC_RULES = [{
-    "id": "r1",
-    "name": "Overheat Alert",
-    "machine": "CNC-Mill-01",
-    "metric": "temperature",
-    "operator": ">",
-    "threshold": 80,
-    "severity": "HIGH",
-    "enabled": True,
-}]
-STATIC_NOTIFICATIONS = [{
-    "id": "n1",
-    "title": "Overheat Warning",
-    "message": "CNC-Mill-01 temp exceeded 80°C",
-    "severity": "HIGH",
-    "read": False,
-}]
-STATIC_THRESHOLD_VERSIONS = [{
-    "version": "v2.1",
-    "proposed_by": "engineer",
-    "approved_by": "auditor",
-    "status": "APPROVED",
-    "changes": "Updated temp limit to 85°C",
-}]
-STATIC_INTEGRATIONS = [{
-    "id": "opc-1",
-    "name": "Plant A OPC-UA Server",
-    "type": "OPC-UA",
-    "endpoint": "opc.tcp://192.168.1.10:4840",
-    "status": "Connected",
-    "latency": "12ms",
-}]
-STATIC_REPORTS = [{
-    "id": "rep-101",
-    "title": "IEC 62443 Security Compliance Pack",
-    "format": "PDF",
-    "generated": "2026-10-01",
-    "size": "2.4 MB",
-}]
+STATIC_RULES = (("r1", "Overheat Alert", "CNC-Mill-01", "temperature", ">", 80, "HIGH", True),)
+STATIC_NOTIFICATIONS = (("n1", "Overheat Warning", "CNC-Mill-01 temp exceeded 80°C", "HIGH", False),)
+STATIC_THRESHOLD_VERSIONS = (("v2.1", "engineer", "auditor", "APPROVED", "Updated temp limit to 85°C"),)
+STATIC_INTEGRATIONS = (("opc-1", "Plant A OPC-UA Server", "OPC-UA", "opc.tcp://192.168.1.10:4840", "Connected", "12ms"),)
+STATIC_REPORTS = (("rep-101", "IEC 62443 Security Compliance Pack", "PDF", "2026-10-01", "2.4 MB"),)
+
+def _static_payload(rows, fields):
+    return [dict(zip(fields, row)) for row in rows]
+
 
 def create_app(override_config=None):
     app = Flask(__name__, static_folder="../static", template_folder="../templates")
@@ -230,11 +200,11 @@ def create_app(override_config=None):
         ("/alerts", "get_alerts", Repository.get_alerts, READ_ROLES),
         ("/maintenance", "get_maintenance", Repository.get_maintenance, READ_ROLES),
         ("/maintenance/workorders", "get_workorders", Repository.get_maintenance, READ_ROLES),
-        ("/rules", "list_rules", STATIC_RULES, READ_ROLES),
-        ("/notifications", "list_notifications", STATIC_NOTIFICATIONS, READ_ROLES),
-        ("/thresholds/versions", "get_threshold_versions", STATIC_THRESHOLD_VERSIONS, ADMIN_AUDIT_ROLES),
-        ("/integrations", "get_integrations", STATIC_INTEGRATIONS, READ_ROLES),
-        ("/reports", "get_reports", STATIC_REPORTS, READ_ROLES),
+        ("/rules", "list_rules", lambda: _static_payload(STATIC_RULES, ("id", "name", "machine", "metric", "operator", "threshold", "severity", "enabled")), READ_ROLES),
+        ("/notifications", "list_notifications", lambda: _static_payload(STATIC_NOTIFICATIONS, ("id", "title", "message", "severity", "read")), READ_ROLES),
+        ("/thresholds/versions", "get_threshold_versions", lambda: _static_payload(STATIC_THRESHOLD_VERSIONS, ("version", "proposed_by", "approved_by", "status", "changes")), ADMIN_AUDIT_ROLES),
+        ("/integrations", "get_integrations", lambda: _static_payload(STATIC_INTEGRATIONS, ("id", "name", "type", "endpoint", "status", "latency")), READ_ROLES),
+        ("/reports", "get_reports", lambda: _static_payload(STATIC_REPORTS, ("id", "title", "format", "generated", "size")), READ_ROLES),
     )
     for route in protected_get_routes:
         register_protected_get(*route)
