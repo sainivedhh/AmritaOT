@@ -207,6 +207,7 @@ def create_app(override_config=None):
             or not isinstance(machine, str)
             or not machine
             or len(machine) > 128
+            or not isinstance(metric, str)
             or metric not in rules.RANGES
         ):
             return jsonify({"error": "Invalid rule fields"}), 400
