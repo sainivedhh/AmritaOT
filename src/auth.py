@@ -19,11 +19,12 @@ def login(request):
     password = data.get("password")
     if (
         not isinstance(username, str)
-        or not username
+        or not username.strip()
         or len(username) > 128
         or not isinstance(password, str)
         or not password
         or len(password) > 1024
+        or any(ord(character) < 32 for character in username)
     ):
         return jsonify({"error": "Invalid credentials"}), 401
 
@@ -88,7 +89,13 @@ def require_role(*allowed_roles):
 
             user_role = claims.get("role")
             username = claims.get("sub")
-            if not isinstance(username, str) or not username or not isinstance(user_role, str):
+            if (
+                not isinstance(username, str)
+                or not username
+                or len(username) > 128
+                or not isinstance(user_role, str)
+                or user_role not in {"admin", "engineer", "auditor"}
+            ):
                 log_event("unknown", "token_invalid_claims", {"endpoint": request.path})
                 return jsonify({"error": "Invalid token"}), 401
 
