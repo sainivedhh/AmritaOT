@@ -1,6 +1,8 @@
 import math
 import time
 
+import json
+
 from flask import Flask, jsonify, request
 from werkzeug.exceptions import HTTPException
 
@@ -190,7 +192,7 @@ def create_app(override_config=None):
         rule = request.get_json(silent=True)
         if not isinstance(rule, dict):
             return jsonify({"error": "Invalid rule object"}), 400
-        if len(rule) > 32 or len(__import__("json").dumps(rule, separators=(",", ":"))) > 4096:
+        if len(rule) > 32 or len(json.dumps(rule, separators=(",", ":"))) > 4096:
             return jsonify({"error": "Rule payload too large"}), 400
         name = rule.get("name")
         machine = rule.get("machine")
