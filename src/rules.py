@@ -37,7 +37,7 @@ def update_threshold(request):
     ):
         return jsonify({"error": "Invalid machine_id"}), 400
         
-    if metric not in RANGES:
+    if not isinstance(metric, str) or metric not in RANGES:
         return jsonify({"error": "Invalid metric"}), 400
         
     if (
