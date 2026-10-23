@@ -14,7 +14,12 @@ from src.validation import check_plausibility, validate_payload
 def verify_signature(payload, signature, nonce, timestamp_str, device_id):
     if not all(isinstance(value, str) and value for value in (payload, signature, nonce, timestamp_str, device_id)):
         return False
-    if len(device_id) > 128 or len(nonce) > 128 or len(timestamp_str) > 32:
+    if (
+        len(device_id) > 128
+        or len(nonce) > 128
+        or len(timestamp_str) > 32
+        or any(ord(character) < 32 for character in device_id + nonce)
+    ):
         return False
     if len(signature) != hashlib.sha256().digest_size * 2:
         return False
@@ -39,8 +44,10 @@ def verify_signature(payload, signature, nonce, timestamp_str, device_id):
     if not hmac.compare_digest(expected_mac, signature):
         return False
 
+    # Payload bytes are capped by Flask's MAX_CONTENT_LENGTH before this stage.
+    # Claim the nonce atomically only after the signature is authenticated.
     Repository.cleanup_nonces(now)
-    return Repository.add_nonce(nonce, now + 300)
+    return Repository.add_nonce(f"{device_id}:{nonce}", now + 300)
 
 
 def process_reading(request):
@@ -60,6 +67,7 @@ def process_reading(request):
 
     data = request.get_json(silent=True)
     if not isinstance(data, dict):
+        log_event(device_id, "ingest_bad_json", {})
         return jsonify({"error": "Invalid JSON object"}), 400
 
     validation_error = validate_payload(data)
