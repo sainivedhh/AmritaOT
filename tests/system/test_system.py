@@ -4,6 +4,8 @@ import os
 import hmac
 import hashlib
 
+from src.ingestion import canonical_signature_message
+
 def test_e2e_alert_flow(client, seed_data):
     # Send out of range reading
     payload = {"temperature": 150.0, "status": "RUNNING"}
@@ -11,7 +13,7 @@ def test_e2e_alert_flow(client, seed_data):
     ts = str(time.time())
     nonce = f"test-{time.time_ns()}"
     secret = os.environ['DEVICE_HMAC_SECRET'].encode('utf-8')
-    data_to_sign = f"M1{ts}{nonce}{payload_str}".encode('utf-8')
+    data_to_sign = canonical_signature_message("M1", ts, nonce, payload_str)
     signature = hmac.new(secret, data_to_sign, hashlib.sha256).hexdigest()
     
     headers = {
