@@ -1,8 +1,9 @@
 import time
 import os
 
-def test_fuzz_inputs(client, seed_data):
-    admin_res = client.post('/login', json={"username": "admin", "password": "adminpass"})
+def test_fuzz_inputs(client, seed_data, tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    admin_res = client.post('/login', json={"username": "admin", "password": seed_data["admin"]})
     token = admin_res.get_json()['token']
     headers = {'Authorization': f'Bearer {token}'}
     
@@ -32,7 +33,4 @@ def test_fuzz_inputs(client, seed_data):
     assert errors_500 == 0, f"Found {errors_500} 500 errors"
     assert crashes == 0, f"Found {crashes} crashes"
     
-    # Save output to evidence if not inside a strict test context, or just let pytest capture it.
-    os.makedirs('evidence', exist_ok=True)
-    with open('evidence/fuzz_after.txt', 'w') as f:
-        f.write(f"Total Requests: {total}\n500 Errors: {errors_500}\nCrashes: {crashes}\n")
+    assert total == len(payloads)
