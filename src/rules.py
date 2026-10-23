@@ -29,7 +29,12 @@ def update_threshold(request):
     min_val = data.get("min_val")
     max_val = data.get("max_val")
     
-    if not machine_id or not re.match(r'^[a-zA-Z0-9_-]+$', machine_id):
+    if (
+        not isinstance(machine_id, str)
+        or not machine_id
+        or len(machine_id) > 128
+        or not re.fullmatch(r"[a-zA-Z0-9_-]+", machine_id)
+    ):
         return jsonify({"error": "Invalid machine_id"}), 400
         
     if metric not in RANGES:
@@ -44,10 +49,11 @@ def update_threshold(request):
         return jsonify({"error": "Invalid min/max"}), 400
         
     try:
-        valid_range = math.isfinite(min_val) and math.isfinite(max_val) and min_val < max_val
+        finite_min = math.isfinite(min_val)
+        finite_max = math.isfinite(max_val)
     except (OverflowError, TypeError, ValueError):
-        valid_range = False
-    if not valid_range:
+        finite_min = finite_max = False
+    if not (finite_min and finite_max and min_val < max_val):
         return jsonify({"error": "Invalid min/max range"}), 400
         
     if not Repository.machine_exists(machine_id):
