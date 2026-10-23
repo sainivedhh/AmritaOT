@@ -97,3 +97,27 @@ def test_canonical_hmac_encoding_prevents_field_boundary_collisions():
     assert canonical_signature_message("M1", "123.5", "nonce", "{}") == (
         b'["M1","123.5","nonce","{}"]'
     )
+
+
+
+def test_config_rejects_reused_application_secrets(tmp_path):
+    from src.config import Config
+
+    secret = "x" * 40
+    with pytest.raises(ValueError, match="must be different"):
+        Config({
+            "JWT_SECRET": secret,
+            "DEVICE_HMAC_SECRET": secret,
+            "DB_PATH": str(tmp_path / "app.db"),
+        })
+
+
+def test_config_requires_absolute_database_path():
+    from src.config import Config
+
+    with pytest.raises(ValueError, match="absolute path"):
+        Config({
+            "JWT_SECRET": "j" * 40,
+            "DEVICE_HMAC_SECRET": "h" * 40,
+            "DB_PATH": "relative.db",
+        })
