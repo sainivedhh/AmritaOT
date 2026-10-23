@@ -159,3 +159,34 @@ def test_notification_read_is_audited(client, seed_data):
     assert response.status_code == 200
     logs = client.get("/audit", headers=headers)
     assert logs.status_code == 403
+
+
+
+def test_threshold_rejects_non_string_metric(client, seed_data):
+    login_response = client.post(
+        "/login",
+        json={"username": "admin", "password": seed_data["admin"]},
+    )
+    token = login_response.get_json()["token"]
+    response = client.put(
+        "/thresholds",
+        json={"machine_id": "M1", "metric": ["temperature"], "min_val": 0, "max_val": 10},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 400
+    assert response.get_json()["error"] == "Invalid metric"
+
+
+def test_rule_rejects_non_string_metric(client, seed_data):
+    login_response = client.post(
+        "/login",
+        json={"username": "engineer", "password": seed_data["engineer"]},
+    )
+    token = login_response.get_json()["token"]
+    response = client.post(
+        "/rules",
+        json={"name": "Invalid metric", "machine": "M1", "metric": ["temperature"]},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 400
+    assert response.get_json()["error"] == "Invalid rule fields"
