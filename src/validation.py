@@ -36,6 +36,10 @@ def validate_payload(data):
     if not isinstance(data, dict):
         return "Payload must be JSON object"
 
+    unknown_metrics = set(data) - set(RANGES) - {"status"}
+    if unknown_metrics:
+        return "Unknown telemetry field"
+
     for k in RANGES:
         if k in data and not validate_metric(k, data[k]):
             return f"Invalid value for {k}"
