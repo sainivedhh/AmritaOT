@@ -13,6 +13,9 @@ from src.repository import Repository
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
+READ_ROLES = ("admin", "engineer", "auditor")
+WRITE_ROLES = ("admin", "engineer")
+
 
 def create_app(override_config=None):
     app = Flask(__name__, static_folder="../static", template_folder="../templates")
@@ -82,7 +85,7 @@ def create_app(override_config=None):
         "/machines/status",
         "machine_status",
         Repository.get_machines_status,
-        ("admin", "engineer", "auditor"),
+        READ_ROLES,
     )
 
     @app.route("/thresholds", methods=["PUT"])
@@ -98,7 +101,7 @@ def create_app(override_config=None):
     )
 
     @app.route("/alerts/<int:alert_id>/acknowledge", methods=["POST"])
-    @auth.require_role("admin", "engineer")
+    @auth.require_role(*WRITE_ROLES)
     def acknowledge_alert(alert_id):
         return rules.ack_alert(alert_id)
 
@@ -232,7 +235,7 @@ def create_app(override_config=None):
     )
 
     @app.route("/notifications/<notification_id>/read", methods=["POST"])
-    @auth.require_role("admin", "engineer", "auditor")
+    @auth.require_role(*READ_ROLES)
     def mark_notification_read(notification_id):
         audit.log_event(auth.g.user, "notification_read", {"notification_id": notification_id})
         return jsonify({"success": True}), 200
