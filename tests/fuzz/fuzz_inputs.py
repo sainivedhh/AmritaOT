@@ -1,8 +1,6 @@
 import time
-import os
 
-def test_fuzz_inputs(client, seed_data, tmp_path, monkeypatch):
-    monkeypatch.chdir(tmp_path)
+def test_fuzz_inputs(client, seed_data):
     admin_res = client.post('/login', json={"username": "admin", "password": seed_data["admin"]})
     token = admin_res.get_json()['token']
     headers = {'Authorization': f'Bearer {token}'}
