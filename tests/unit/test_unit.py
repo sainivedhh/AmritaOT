@@ -80,3 +80,8 @@ def test_audit_verifier_accepts_existing_legacy_entries(app):
             "details": details,
             "hash": old_hash,
         }]) is True
+
+
+
+def test_payload_rejects_unknown_fields():
+    assert validate_payload({"temperature": 25.0, "status": "RUNNING", "admin": True}) == "Unknown telemetry field"
