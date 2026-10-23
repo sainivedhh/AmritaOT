@@ -1,4 +1,3 @@
-import math
 import json
 import math
 import time
@@ -56,7 +55,6 @@ STATIC_REPORTS = [{
     "generated": "2026-10-01",
     "size": "2.4 MB",
 }]
-
 
 def create_app(override_config=None):
     app = Flask(__name__, static_folder="../static", template_folder="../templates")
@@ -123,14 +121,10 @@ def create_app(override_config=None):
     def readings():
         return ingestion.process_reading(request)
 
-
-
     @app.route("/thresholds", methods=["PUT"])
     @auth.require_role("admin")
     def update_thresholds():
         return rules.update_threshold(request)
-
-
 
     @app.route("/alerts/<int:alert_id>/acknowledge", methods=["POST"])
     @auth.require_role(*WRITE_ROLES)
@@ -184,8 +178,6 @@ def create_app(override_config=None):
         )
         return jsonify({"status": "Scheduled"}), 201
 
-
-
     @app.route("/audit", methods=["GET"])
     @app.route("/audit/verify", methods=["GET"])
     @auth.require_role(*ADMIN_AUDIT_ROLES)
@@ -193,8 +185,6 @@ def create_app(override_config=None):
         logs = audit.get_all()
         valid = audit.verify_chain(logs)
         return jsonify({"valid": valid, "logs": logs, "valid_chain": valid})
-
-
 
     @app.route("/rules", methods=["POST"])
     @auth.require_role("admin", "engineer")
@@ -229,15 +219,11 @@ def create_app(override_config=None):
         audit.log_event(auth.g.user, "delete_rule", {"rule_id": rule_id})
         return jsonify({"success": True}), 200
 
-
-
     @app.route("/notifications/<notification_id>/read", methods=["POST"])
     @auth.require_role(*READ_ROLES)
     def mark_notification_read(notification_id):
         audit.log_event(auth.g.user, "notification_read", {"notification_id": notification_id})
         return jsonify({"success": True}), 200
-
-
 
     protected_get_routes = (
         ("/machines/status", "machine_status", Repository.get_machines_status, READ_ROLES),
