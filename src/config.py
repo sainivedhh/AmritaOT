@@ -20,6 +20,12 @@ class Config:
             raise ValueError("JWT_SECRET must contain at least 32 bytes")
         if len(self.DEVICE_HMAC_SECRET.encode("utf-8")) < 32:
             raise ValueError("DEVICE_HMAC_SECRET must contain at least 32 bytes")
+        if self.JWT_SECRET == self.DEVICE_HMAC_SECRET:
+            raise ValueError("JWT_SECRET and DEVICE_HMAC_SECRET must be different")
+        if self.DB_PATH != ":memory:" and not os.path.isabs(self.DB_PATH):
+            raise ValueError("DB_PATH must be an absolute path or :memory:")
+        if self.DB_PATH.endswith((".py", ".env")):
+            raise ValueError("DB_PATH must identify a database file")
 
 
 def get_config(override=None):
