@@ -85,3 +85,15 @@ def test_audit_verifier_accepts_existing_legacy_entries(app):
 
 def test_payload_rejects_unknown_fields():
     assert validate_payload({"temperature": 25.0, "status": "RUNNING", "admin": True}) == "Unknown telemetry field"
+
+
+
+def test_canonical_hmac_encoding_prevents_field_boundary_collisions():
+    from src.ingestion import canonical_signature_message
+
+    first = canonical_signature_message("ab", "c", "d", "e")
+    second = canonical_signature_message("a", "bc", "d", "e")
+    assert first != second
+    assert canonical_signature_message("M1", "123.5", "nonce", "{}") == (
+        b'["M1","123.5","nonce","{}"]'
+    )
