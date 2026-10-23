@@ -43,7 +43,11 @@ def create_app(override_config=None):
 
     @app.errorhandler(429)
     def ratelimit_handler(error):
-        audit.log_event(get_remote_address(), "rate_limit_exceeded", {"path": request.path})
+        try:
+            audit.log_event(get_remote_address(), "rate_limit_exceeded", {"path": request.path})
+        except Exception:
+            # Rate limiting must still return the expected response if audit storage is unavailable.
+            app.logger.exception("Could not record rate-limit event")
         return jsonify({"error": "Rate limit exceeded"}), 429
 
     def register_protected_get(path, endpoint, provider, roles):
@@ -107,7 +111,12 @@ def create_app(override_config=None):
         scheduled_for = data.get("scheduled_for")
         description = data.get("description")
 
-        if not isinstance(machine_id, str) or not machine_id:
+        if (
+            not isinstance(machine_id, str)
+            or not machine_id
+            or len(machine_id) > 128
+            or not all(character.isalnum() or character in "_-" for character in machine_id)
+        ):
             return jsonify({"error": "Invalid machine_id"}), 400
         if not Repository.machine_exists(machine_id):
             return jsonify({"error": "Machine not found"}), 404
@@ -122,7 +131,12 @@ def create_app(override_config=None):
             valid_schedule = False
         if not valid_schedule:
             return jsonify({"error": "Invalid future date"}), 400
-        if not isinstance(description, str) or not description.strip() or len(description) > 1000:
+        if (
+            not isinstance(description, str)
+            or not description.strip()
+            or len(description) > 1000
+            or any(ord(character) < 32 and character not in "\t\n\r" for character in description)
+        ):
             return jsonify({"error": "Invalid description"}), 400
 
         Repository.create_maintenance(machine_id, scheduled_for, description.strip(), auth.g.user)
@@ -176,6 +190,21 @@ def create_app(override_config=None):
         rule = request.get_json(silent=True)
         if not isinstance(rule, dict):
             return jsonify({"error": "Invalid rule object"}), 400
+        if len(rule) > 32 or len(__import__("json").dumps(rule, separators=(",", ":"))) > 4096:
+            return jsonify({"error": "Rule payload too large"}), 400
+        name = rule.get("name")
+        machine = rule.get("machine")
+        metric = rule.get("metric")
+        if (
+            not isinstance(name, str)
+            or not name.strip()
+            or len(name) > 128
+            or not isinstance(machine, str)
+            or not machine
+            or len(machine) > 128
+            or metric not in rules.RANGES
+        ):
+            return jsonify({"error": "Invalid rule fields"}), 400
         audit.log_event(auth.g.user, "save_rule", rule)
         return jsonify({"success": True, "rule": rule}), 201
 
